@@ -77,6 +77,7 @@ It tends to start as an abstraction of static data for better separation of conc
 import toc from './toc.json'
 
 // UI for navigation
+
 ;<TOC toc={toc} />
 
 // RSS feed

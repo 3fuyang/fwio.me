@@ -42,7 +42,7 @@ function groupPostsByYear(posts: Post[]) {
   {
     postsByYear.map(({ year, posts }) => (
       <section class="relative py-4">
-        <h2 class="year-marker pointer-events-none absolute top-0 left-0 text-4xl text-transparent opacity-50 select-none">
+        <h2 class="year-marker pointer-events-none absolute left-0 top-0 select-none text-4xl text-transparent opacity-50">
           {year}
         </h2>
         <ul class="space-y-6">
