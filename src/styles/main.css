@@ -50,7 +50,7 @@
 }
 
 img {
-  @apply select-none rounded-md;
+  @apply rounded-md select-none;
 }
 
 a.prose-heading-anchor {
@@ -73,12 +73,20 @@ a.prose-heading-anchor:hover {
   scroll-margin-block-start: 4rem;
 }
 
+.prose *:not(:where([class~='not-prose'], [class~='not-prose'] *)) {
+  @apply tracking-wide;
+}
+
+.prose strong:not(:where([class~='not-prose'], [class~='not-prose'] *)) {
+  @apply font-medium;
+}
+
 .prose h2:not(:where([class~='not-prose'], [class~='not-prose'] *)) {
   @apply mt-6;
 }
 
 .prose h1:not(:where([class~='not-prose'], [class~='not-prose'] *)) {
-  @apply mb-6 text-pretty leading-snug;
+  @apply mb-6 leading-snug text-pretty;
 }
 
 .prose p:not(:where([class~='not-prose'], [class~='not-prose'] *)) {
