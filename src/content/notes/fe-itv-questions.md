@@ -1,14 +1,26 @@
 ---
 title: FE Interview Questions
-description: Notes for CodeMirror 6
+description: Notes for possible interview questions.
 lang: zh
 pubDate: 2025-02-06T10:00:00+08:00
 draft: true
 ---
 
+## JavaScript
+
+### Closure（闭包）
+
 ## HTTP
 
+### Methods
+
+### Status Codes
+
 ### Cache
+
+#### No-Storage
+
+该响应
 
 #### Stale-While-Revalidate
 

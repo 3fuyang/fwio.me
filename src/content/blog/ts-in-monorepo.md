@@ -11,11 +11,9 @@ In a TypeScript monorepo, how can we perform type checking across sub-projects w
 
 ## Solutions
 
-I learnt most of the solutions mostly from Ahmed Elsakaan's video [The Dilemma of TypeScript in Monorepos](https://www.youtube.com/watch?v=RRsttfhg1sA) and the [TypeScript Project References series](https://nx.dev/blog/managing-ts-packages-in-monorepos) published recently by Nx.
-
 ### Relative Imports
 
-As a naive way to reference code, relative imports just works.
+As a naive way to reference code, direct module imports, a.k.a. relative imports, just works.
 
 ```ts
 import { foo } from '../../packages/some-package'
@@ -33,7 +31,7 @@ To my surprise, path aliases has been [the default strategy in Nx](https://nx.de
 ```json
 {
   "compilerOptions": {
-    "baseUrl": ".",
+    "baseUrl": ".", // Not required to be set when using `paths` since TypeScript 4.1
     "paths": {
       "@sample/*": ["../../packages/*"]
     }
@@ -43,7 +41,9 @@ To my surprise, path aliases has been [the default strategy in Nx](https://nx.de
 
 With the specified alias, we can reference other projects just like importing external packages.
 
-A main drawback of path aliases is that, it's a TypeScript feature in essence, and we need to tweak our toolings to make it work seamlessly at runtime, i.e. plugins like `vite-tsconfig-paths` or `tsconfig-paths-webpack-plugin`.
+> However, path aliases tell TypeScript to not treat the import statement **as a module to be resolved**, but rather use the key of '@sample/some-package' as a reference to where the module is located. TypeScript does not actually replace the import path during compilation. See https://monorepo.tools/typescript#mapping-to-a-path.
+
+As a result, we need to tweak our toolings to make the import statement work seamlessly at runtime, i.e. plugins like `vite-tsconfig-paths` or `tsconfig-paths-webpack-plugin`.
 
 And still, the type checking is at TypeScript level.
 
@@ -140,3 +140,9 @@ The solutions, after all, are certain tradeoffs between the two rectangular dime
    3. Switch to project reference or built packages according to your need when the build time becomes noticeable.
 
 And relative imports? Please, just forget about it.
+
+## References
+
+- [The Dilemma of TypeScript in Monorepos](https://www.youtube.com/watch?v=RRsttfhg1sA)
+- [Managing TypeScript Packages in Monorepos](https://nx.dev/blog/managing-ts-packages-in-monorepos)
+- [Monorepo Explained | TypeScript](https://monorepo.tools/typescript)
