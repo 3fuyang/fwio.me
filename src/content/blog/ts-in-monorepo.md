@@ -43,9 +43,7 @@ With the specified alias, we can reference other projects just like importing ex
 
 > However, path aliases tell TypeScript to not treat the import statement **as a module to be resolved**, but rather use the key of '@sample/some-package' as a reference to where the module is located. TypeScript does not actually replace the import path during compilation. See https://monorepo.tools/typescript#mapping-to-a-path.
 
-As a result, we need to tweak our toolings to make the import statement work seamlessly at runtime, i.e. plugins like `vite-tsconfig-paths` or `tsconfig-paths-webpack-plugin`.
-
-And still, the type checking is at TypeScript level.
+As a result, we need to tweak our toolings to make the import statement work seamlessly at runtime, i.e. with plugins like `vite-tsconfig-paths` or `tsconfig-paths-webpack-plugin`. Also, the code of different projects is **not really isolated** as those in a monorepo should be, restricting the type checking at TypeScript level again, which eliminates possible performance gain.
 
 ### Internal Packages
 
@@ -78,27 +76,32 @@ That said, for internal packages that you would never want to publish, this is v
 
 ### Project References
 
-[Project references](https://www.typescriptlang.org/docs/handbook/project-references.html) is the native way provided by TypeScript to reference types across projects. In other words, it's a type only strategy and has nothing to do with the runtime behavior.
+[Project references](https://www.typescriptlang.org/docs/handbook/project-references.html) is the native way provided by TypeScript to reference types across projects.
+
+Specifying `references` in `tsconfig.json` informs the TypeScript compiler about other projects nested in the current one, thus enabling the compiler to treat them as isolated pieces of code. This project-level isolation helps the TypeScript compiler to optimize type checking with parallel and incremental processing.
 
 ```json
 // apps/some-app/tsconfig.json
 {
-  "references": [{ "path": "../packages/some-package" }]
+  "references": [
+    { "path": "../packages/some-package" },
+    { "path": "../packages/another-package" }
+  ]
 }
 ```
 
-With project references, importing modules from referenced projects would import their output declaration files(`.d.ts`) instead, without touching any of its source code. Notably, the build is scoped within each project, aka. **project-level**, which introduces the possibility of **parallel** and **incremental** type checking.
+With project references, importing modules from referenced projects would import their output declaration files(`.d.ts`) instead, without touching any of its source code, so no build is required.
 
 Project references has its own drawbacks:
 
-1. You need to build the referenced project first.
-2. The `references` field needs careful maintaining.
+1. You need to run the TypeScript compiler against referenced projects first.
+2. Mental burden of maintaining the `references` field.
 
-For the first problem, running `tsc -b` will compile the project in build mode, which helps you figure out the dependency graph and compile referenced projects on demand. We can put this command into our `prepare` or other scripts.
+For the first problem, the TypeScript compiler provides `tsc -b` command which compiles the project in **build mode**. This will automatically figure out the dependency graph and compile referenced projects **on demand**. For convenience, you can put this command into the `prepare` or other npm scripts accordingly.
 
-And for the second one, additional build tools like Nx could handle the process automatically for you.
+And for the second one, monorepo tools could handle the process automatically for you.
 
-Lastly, all the referenced projects need to be declared in the root-level TypeScript config to allow the editor to correctly find all the available projects in your monorepo, while this is not required for running `tsc`.
+To get better editor experience, it is recommended to declare all the referenced projects in the root-level TypeScript config, which allows the editor to correctly find all the available projects in your monorepo, while this is not required for simply running `tsc`.
 
 ```json
 // /tsconfig.json
@@ -115,7 +118,7 @@ Lastly, all the referenced projects need to be declared in the root-level TypeSc
 
 ### Built Packages
 
-Remember our requirement is to perform type checking with building packages? Actually building them is not that scary but perhaps the most reliable approach. You don't need any of the setup or configurations mentioned in the approaches above and don't have to worry about publishing any of the packages. All you need is to run a `pnpm build -r` or similar commands from your preferred package manager. As for the build time, while it could explode with the complexity growing, luckily, tools like Nx and Turporepo can help improve the process via smart caching mechanisms.
+Although our pre-assumption was type checking without building, pre-built projects is still a very practical solution since there's no additional overhead mentioned above except an extra build step is required before you can use these packages. To address this, monorepo tools like Nx/Turporepo can help improve the process via automatic building and caching the dependencies for you.
 
 ## Comparison Table
 
@@ -127,15 +130,15 @@ Remember our requirement is to perform type checking with building packages? Act
 | Project References | High\*           | High                    | ✅          | Medium          |
 | Built Packages     | Low              | High\*                  | ✅          | High            |
 
-\*With build tools like Turborepo/Nx.
+\*With monorepo tools like Turborepo/Nx.
 
 ## Wrapping Up
 
-The solutions, after all, are certain tradeoffs between the two rectangular dimensions of our project - types and runtime, each of which could run on its own. To determine which approach to adopt, here are some of my personal thoughts:
+The solutions, after all, are certain tradeoffs between the two orthogonal dimensions of our project - types and runtime, each of which could run on its own. To determine which approach to adopt, here are my personal thoughts:
 
 1. For moderate or large monorepo projects, use Turborepo/Nx or other monorepo management tools from the very beginning, and stick to its recommended practice.
 2. For smaller ones:
-   1. Use internal packages if the consuming application can transpile referenced projects without extra configuration and you the referenced packages are for internal usage only.
+   1. Use internal packages if the consuming application can transpile referenced projects without extra configuration and the referenced packages are for internal usage only.
    2. Use path aliases for simplicity.
    3. Switch to project reference or built packages according to your need when the build time becomes noticeable.
 
