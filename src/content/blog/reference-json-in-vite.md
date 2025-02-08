@@ -77,8 +77,9 @@ It tends to start as an abstraction of static data for better separation of conc
 import toc from './toc.json'
 
 // UI for navigation
-
-;<TOC toc={toc} />
+function Nav() {
+  return <TOC toc={toc} />
+}
 
 // RSS feed
 await writeFile('rss.xml', generateRSSFeed(toc))
