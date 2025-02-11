@@ -52,18 +52,16 @@ const {
         system: 'system',
       }
 
-      const prevTheme =
-        JSON.parse(localStorage.getItem(THEME_LOCAL_STORAGE_KEY)) ?? 'system'
+      const prevTheme = localStorage[THEME_LOCAL_STORAGE_KEY] ? JSON.parse(localStorage[THEME_LOCAL_STORAGE_KEY]) : 'system'
       const isDarkOS = window.matchMedia('(prefers-color-scheme: dark)').matches
       const isDarkMode =
         prevTheme === THEME_ENUM.dark ||
         (prevTheme === THEME_ENUM.system && isDarkOS)
 
-      if (isDarkMode) {
-        document.documentElement.classList.add(THEME_ENUM.dark)
-      } else {
-        document.documentElement.classList.remove(THEME_ENUM.dark)
-      }
+        document.documentElement.classList.toggle(
+          THEME_ENUM.dark,
+          isDarkMode
+        )
     </script>
     {isProd && <SpeedInsights />}
   </head>
