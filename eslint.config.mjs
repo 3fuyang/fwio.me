@@ -5,7 +5,6 @@ import * as tsParser from '@typescript-eslint/parser'
 import eslintPluginAstro from 'eslint-plugin-astro'
 // @ts-expect-error
 import hooksPlugin from 'eslint-plugin-react-hooks'
-import tailwind from 'eslint-plugin-tailwindcss'
 import globals from 'globals'
 import tseslint from 'typescript-eslint'
 
@@ -26,7 +25,6 @@ export default tseslint.config(
   pluginJs.configs.recommended,
   ...eslintPluginAstro.configs['flat/recommended'],
   tseslint.configs.eslintRecommended,
-  ...tailwind.configs['flat/recommended'],
   {
     plugins: {
       'react-hooks': hooksPlugin,
