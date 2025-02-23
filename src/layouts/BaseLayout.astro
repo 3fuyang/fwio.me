@@ -43,6 +43,7 @@ const {
     <link rel="icon" type="image/svg+xml" href="/fwio.svg" />
     <link rel="apple-touch-icon" href="/fwio-apple-touch.png" sizes="180x180" />
     <link rel="mask-icon" href="/fwio.svg" color="#FFFFFF" />
+    {isProd && <link rel="preconnect" href="https://www.googletagmanager.com" />}
     <slot name="head" />
     <script is:inline>
       const THEME_LOCAL_STORAGE_KEY = 'usehooks-ts-ternary-dark-mode'
@@ -99,7 +100,7 @@ const {
             aria-hidden="true"
             src={Seagull}
             alt=""
-            fetchpriority="high"
+            loading="eager"
             class="pointer-events-none fixed left-1/2 top-1/2 aspect-square h-auto max-w-[45%] -translate-x-1/2 -translate-y-1/2 opacity-45 md:max-w-[17%]"
           />
         )
