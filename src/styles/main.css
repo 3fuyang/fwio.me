@@ -8,7 +8,8 @@
   --c-scrollbar-hover: oklch(70.02% 0.0261 290.81);
   --c-scrollbar-active: oklch(57.27% 0 0);
 
-  font-family: 'Geist Variable', sans-serif, 'PingFang SC', 'HarmonyOS_Regular',
+  font-family:
+    'Geist Variable', sans-serif, 'PingFang SC', 'HarmonyOS_Regular',
     'Helvetica Neue', 'Microsoft YaHei';
 }
 

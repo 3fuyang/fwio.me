@@ -23,9 +23,9 @@ const fLinks = [
 ---
 
 <header
-  class="backdrop-blur-xs sticky top-0 z-10 flex items-center justify-between space-x-6 px-6 py-3 text-sm tracking-wider backdrop-saturate-50 md:text-base"
+  class="sticky top-0 z-10 flex items-center justify-between space-x-6 px-6 py-3 text-sm tracking-wider backdrop-blur-xs backdrop-saturate-50 md:text-base"
 >
-  <a href="/" class="outline-hidden select-none font-mono">Fwio</a>
+  <a href="/" class="font-mono outline-hidden select-none">Fwio</a>
   <nav class="flex items-center space-x-4 md:space-x-8">
     {fLinks.map((fLink) => <FLink {...fLink} />)}
     <a

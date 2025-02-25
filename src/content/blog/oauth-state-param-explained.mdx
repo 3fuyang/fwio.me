@@ -1,0 +1,79 @@
+---
+title: How does the "state" parameter prevent CSRF in OAuth?
+description: A kinda reversed version of CSRF attack - that's what the `state` parameter prevents.
+lang: en
+pubDate: 2025-02-24T20:00:00+08:00
+keywords: ['oauth', 'csrf', 'security']
+---
+
+import { Image } from 'astro:assets'
+import diagramDark from '../../assets/oauth-state-param-explained/csrf-in-oauth-dark.svg'
+import diagram from '../../assets/oauth-state-param-explained/csrf-in-oauth.svg'
+import afterDiagramDark from '../../assets/oauth-state-param-explained/state-prevent-csrf-in-oauth-dark.svg'
+import afterDiagram from '../../assets/oauth-state-param-explained/state-prevent-csrf-in-oauth.svg'
+
+The purpose of the [`state`](https://datatracker.ietf.org/doc/html/rfc6749#section-4.1.1) parameter has been a mystery for me for a long time. I tried to make sense of it from those **"preventing CSRF attacks"** quotations over and over again, but it just didn't click (I even talked with ChatGPT for 1 hour about this, just to find it's making up stories again). Today, encountered this concept again while reading [The Copenhagen Book](https://thecopenhagenbook.com/), I finally decided to figure out what this echoed parameter is about.
+
+## Prevent CSRF, but how?
+
+> Sometime it's difficult for me to understand some HTTP security concepts with a long history, because imaging a practical scenario for the vulnerability is just difficult. That's why this post aims at a specific example.
+
+Every answer and explanation about the `state` parameter was talking about preventing CSRF attacks, but how does the attack happen in a typical OAuth flow? I mean, the user accesses the login endpoint and gets redirected to the OAuth provider's page, tweaking some confirmation and then redirected back to the client's page. Where does the attacker come in?
+
+Let's use a diagram to illustrate the attack scenario:
+
+<Image
+  className="block dark:hidden"
+  src={diagram}
+  alt="Illustrating CSRF attack in an OAuth flow"
+/>
+
+<Image
+  className="hidden dark:block"
+  src={diagramDark}
+  alt="Illustrating CSRF attack in an OAuth flow"
+/>
+
+Notably, there's only one legitimate OAuth app (our client) in this scenario, and both the user and the attacker manipulate on this app.
+
+The malicious steps are highlighted in the diagram:
+
+1. The attacker enters the OAuth app, and request an OAuth login.
+2. After the attacker confirms the authorization with his own OAuth provider account, an **authorization code** is generated and returned to the client.
+3. ⚠️ Instead of calling the callback endpoint to exchange an access token with the code, the attacker extracts and keeps it.
+4. ⚠️ The attacker constructs the **malicious link** with this one-time code and sends it to the victim.
+5. The victim is misled or prompted to open the link. (A simple request from some image or iframe, for example)
+6. The victim's client exchanges an access token with the given authorization code.
+7. ❌ The victim is authenticated to the app, but with **the attacker's identity**!
+
+Now imagine the legitimate app is a payment app, and the attacker can make various transactions on the OAuth provider platform, but you instead pay these bills.
+
+## The `state` parameter
+
+According to the [spec](https://datatracker.ietf.org/doc/html/rfc6749#section-4.1.1), the `state` parameter is an **opaque** value used by the client to **maintain state between the request and callback**.
+
+In other words, it's a client generated **encrypted** string that is sent to the OAuth provider and echoed back to the client with the authorization code, thus keeping a **session** between the OAuth request and the callback.
+
+It is the client's responsibility to check if the `state` parameter in the callback matches the one sent in the request. If they don't match, the client should **abort the flow**.
+
+<Image
+  className="block dark:hidden"
+  src={afterDiagram}
+  alt="How state prevent CSRF in an OAuth flow"
+/>
+
+<Image
+  className="hidden dark:block"
+  src={afterDiagramDark}
+  alt="How state prevent CSRF in an OAuth flow"
+/>
+
+## Recap
+
+I think the point of understanding how `state` prevent CSRF is that the attack is achieved by authenticating user with the attacker's identity, pretty the opposite of the traditional CSRF attack.
+
+## Further Reading
+
+- [RFC 6749 - The OAuth 2.0 Authorization Framework](https://datatracker.ietf.org/doc/html/rfc6749)
+- [OAuth - The Copenhagen Book](https://thecopenhagenbook.com/oauth#validate-authorization-code)
+- [The importance of the “state” parameter in OAuth | by Sebastian Łaskawiec | Keycloak | Medium](https://medium.com/keycloak/the-importance-of-the-state-parameter-in-oauth-5419c94bef4c)

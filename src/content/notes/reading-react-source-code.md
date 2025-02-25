@@ -18,8 +18,7 @@ draft: true
 
 Return value of `React.createElement`, always an object.
 
-> [!NOTE]
-> `ReactNode` is the set of all possible return values of a component.
+> [!NOTE] > `ReactNode` is the set of all possible return values of a component.
 
 ### Fiber
 
@@ -30,63 +29,60 @@ A few key fields:
 ```ts
 type Fiber = {
   // Unique identifier of this child.
-  key: string | null,
+  key: string | null
 
   // The local state associated with this fiber,
   // e.g. DOM node for `HostComponent`,
   // or instance for `ClassComponent`.
-  stateNode: any,
+  stateNode: any
 
   // The `Fiber` to return to after finishing processing(dfs) this one.
-  return: Fiber | null,
+  return: Fiber | null
 
   // Singly Linked List Tree Structure.
-  child: Fiber | null,
-  sibling: Fiber | null,
-  index: number,
+  child: Fiber | null
+  sibling: Fiber | null
+  index: number
 
   // The ref last used to attach this node.
-  ref:
-    | null
-    | (((handle: any) => void) & { _stringRef?: string })
-    | RefObject,
-  refCleanup: null | (() => void),
+  ref: null | (((handle: any) => void) & { _stringRef?: string }) | RefObject
+  refCleanup: null | (() => void)
 
   // The data coming into process this fiber.
-  pendingProps: any,
+  pendingProps: any
   // The props used to create the output.
-  memoizedProps: any,
+  memoizedProps: any
 
   // A queue for state updates and callbacks.
-  updateQueue: any,
+  updateQueue: any
 
   // The state used to create the output,
   // e.g. hooks for function components.
-  memoizedState: any,
+  memoizedState: any
 
   // Dependencies (contexts, events) for this fiber, if it has any.
-  dependencies: Dependencies | null,
+  dependencies: Dependencies | null
 
   // Bit field to describe the render mode of this fiber,
   // e.g. `ConcurrentMode`, `NoStrictPassiveEffectsMode`, `StrictLegacyMode`.
   // When a fiber is created, it inherits the mode of its parent.
   // Additional flags can be set at creation time, but after that the value should remain unchanged throughout the fiber's lifetime.
-  mode: TypeOfMode,
+  mode: TypeOfMode
 
   // Effects
-  flags: Flags,
-  subtreeFlags: Flags,
-  deletions: Array<Fiber> | null,
+  flags: Flags
+  subtreeFlags: Flags
+  deletions: Array<Fiber> | null
 
   // Priority level of this fiber.
-  lanes: Lanes,
+  lanes: Lanes
   // Priority level of the subtree.
-  childLanes: Lanes,
+  childLanes: Lanes
 
   // This is a pooled version of a Fiber. Every fiber that gets updated will
   // eventually have **a pair**. There are cases when we can clean up pairs to save
   // memory if we need to.
-  alternate: Fiber | null,
+  alternate: Fiber | null
 }
 ```
 
@@ -95,6 +91,7 @@ type Fiber = {
 Hooks are stored as a linked list on the fiber's `memoizedState` field.
 
 ```ts
+
 ```
 
 ## Random Notes
@@ -119,14 +116,14 @@ How React [schedules tasks](https://github.com/facebook/react/blob/192555bb0ed88
 
 1. Use [`setImmediate`](https://developer.mozilla.org/en-US/docs/Web/API/Window/setImmediate) if available
 2. Use `MessageChannel` if available, preferred because of the 4ms `setTimeout` clamping
-    - ```ts
-      const channel  = new MessageChannel()
-      const port = channel.port2
-      channel.port1.onmessage = performWorkUntilDeadline
-      schedulePerformWorkUntilDeadline = () => {
-        port.postMessage(null)
-      }
-      ```
+   - ```ts
+     const channel = new MessageChannel()
+     const port = channel.port2
+     channel.port1.onmessage = performWorkUntilDeadline
+     schedulePerformWorkUntilDeadline = () => {
+       port.postMessage(null)
+     }
+     ```
 3. Use `setTimeout` with a 0ms delay as a fallback
 
 ## Notes of Reading Community Posts
