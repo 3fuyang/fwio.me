@@ -22,9 +22,14 @@ Return value of `React.createElement`, always an object.
 
 ### Fiber
 
-According to the code comment: a `Fiber` is work on a `Component` that needs to be done or was done. There can be more than one per component.
+According to the code comment: a `Fiber` is work on a `Component` that needs to be done or was done. However, a `Fiber` also represents a React component in the React tree.
 
-A few key fields:
+So a `Fiber` has two dimensions of meaning:
+
+1. The work to be done or was done.
+2. The internal representation of React components (like VNode) in your React app.
+
+A few key fields of the `Fiber` structure:
 
 ```ts
 type Fiber = {
@@ -53,7 +58,7 @@ type Fiber = {
   // The props used to create the output.
   memoizedProps: any
 
-  // A queue for state updates and callbacks.
+  // A struct to manage updates, like state updates and callbacks such as passive effects.
   updateQueue: any
 
   // The state used to create the output,
@@ -80,7 +85,7 @@ type Fiber = {
   childLanes: Lanes
 
   // This is a pooled version of a Fiber. Every fiber that gets updated will
-  // eventually have **a pair**. There are cases when we can clean up pairs to save
+  // eventually has **a pair**. There are cases when we can clean up pairs to save
   // memory if we need to.
   alternate: Fiber | null
 }
@@ -88,10 +93,31 @@ type Fiber = {
 
 ### Hooks
 
-Hooks are stored as a linked list on the fiber's `memoizedState` field.
+`Hook`s are stored as a linked list on the `memoizedState` field of a Function Component's `Fiber`.
 
 ```ts
+interface Hook {
+  memoizedState: any // The current state it holds
+  baseState: any // The initial state or the base state from which updates are derived
+  queue: UpdateQueue | null // An object to manage updates
+  baseQueue: UpdateQueue | null // An object to manage rebase updates
+  next: Hook | null // Form a linked list
+}
+```
 
+### UpdateQueue
+
+An `UpdateQueue` is an object that manages updates for a `Hook`.
+
+```ts
+interface UpdateQueue<S, A> {
+  pending: Update<S, A> | null
+  lanes: Lanes
+  /** The `dispatch` function is **stable** across the component lifetime. */
+  dispatch: (A => any) | null
+  lastRenderedReducer: ((S, A) => S) | null
+  lastRenderedState: S | null
+}
 ```
 
 ## Random Notes
@@ -110,12 +136,12 @@ How React [schedules microtasks](https://github.com/facebook/react/blob/192555bb
 
 ### Scheduling Tasks
 
-> I use the term task here since macrotask is literally not a standard term. BTW the terminology is not crucial here, what React wants is to yield to the browser's event loop, avoiding long tasks.
+> Here the term "task" is used since macrotask is actually not a standard term. BTW the terminology is not crucial here, what React wants is to yield to the browser's event loop, avoiding long tasks.
 
 How React [schedules tasks](https://github.com/facebook/react/blob/192555bb0ed88db30f91c58651c421f178f90384/packages/scheduler/src/forks/Scheduler.js#L516):
 
-1. Use [`setImmediate`](https://developer.mozilla.org/en-US/docs/Web/API/Window/setImmediate) if available
-2. Use `MessageChannel` if available, preferred because of the 4ms `setTimeout` clamping
+1. Use [`setImmediate`](https://developer.mozilla.org/en-US/docs/Web/API/Window/setImmediate) if available.
+2. Use `MessageChannel` if available, preferred because of the 4ms `setTimeout` clamping.
    - ```ts
      const channel = new MessageChannel()
      const port = channel.port2
@@ -132,9 +158,9 @@ How React [schedules tasks](https://github.com/facebook/react/blob/192555bb0ed88
 
 When you change React state, React doesn’t immediately change the state. Instead, React queues the update and schedules a render. When React starts to render, it will then look at the entire queue of updates, and use different heuristics and algorithms to determine the next update to work on. This process has safeguards and semantics in place to ensure that rendering is always consistent.
 
-- `setState` within `useEffect` is now async during rendering
-- `setState` during `useLayoutEffect` will be sync
+- `setState` within `useEffect` is now async during rendering.
+- `setState` during `useLayoutEffect` will be sync.
 
 [Why `useSyncExternalStore` Is Not Used in Jotai · Daishi Kato's blog](https://blog.axlight.com/posts/why-use-sync-external-store-is-not-used-in-jotai/)
 
-- `useState` does eager bail out while `useReducer` does not
+- `useState` does eager bail out while `useReducer` does not.

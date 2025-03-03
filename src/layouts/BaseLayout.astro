@@ -1,5 +1,4 @@
 ---
-import SpeedInsights from '@vercel/speed-insights/astro'
 import { Image } from 'astro:assets'
 import '@fontsource-variable/geist'
 import Footer from '@/components/Footer.astro'
@@ -64,7 +63,11 @@ const {
           isDarkMode
         )
     </script>
-    {isProd && <SpeedInsights />}
+    {isProd && <script>
+      import('@vercel/speed-insights').then(({ injectSpeedInsights }) => {
+        injectSpeedInsights()
+      })
+    </script>}
   </head>
   <!-- Third-party scripts in production -->
   <Fragment>
