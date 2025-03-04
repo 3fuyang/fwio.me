@@ -29,6 +29,11 @@ So a `Fiber` has two dimensions of meaning:
 1. The work to be done or was done.
 2. The internal representation of React components (like VNode) in your React app.
 
+Notably, all `Fiber` nodes are processed by [`beginWork()`](https://github.com/facebook/react/blob/main/packages/react-reconciler/src/ReactFiberBeginWork.js#L3769), the return value of which decides the next step of the reconciliation process:
+
+- `Fiber` - Keep processing the next fiber (work).
+- `null` - We should stop and finish the current render.
+
 A few key fields of the `Fiber` structure:
 
 ```ts
@@ -119,6 +124,55 @@ interface UpdateQueue<S, A> {
   lastRenderedState: S | null
 }
 ```
+
+## Crucial Process
+
+### Bailout
+
+Let's first recall how a typical React 18 app consisting of function components re-renders.
+
+Imagine a minimal counter app: the `<Counter />` component lies in the downstream of the tree, and a click event handler schedules an update on the `Fiber` of this component.
+
+First, here's how the update gets scheduled:
+
+1. The `onClick` handler calls `setState()`, which calls the React builtin dispatcher function. Call chain: `setState() -> dispatchSetState() -> dispatchSetStateInternal() -> scheduleUpdateOnFiber()`.
+2. In `scheduleUpdateOnFiber()`, the root will be marked with a pending update, and a rerender is scheduled via `ensureRootIsScheduled()`.
+3. During rerender, `beginWork()` is called against the root `Fiber` node, which starts the reconciliation process.
+4. In `beginWork()`, a strict equality comparison between `current.memoizedProps` and `workInProgress.pendingProps` will be made to determine if the component should enter the render phase.
+5. If the two props are equal, and there are no updates detected on the fiber, we will enter `attemptEarlyBailoutIfNoScheduledUpdate()`. This function does some bookkeeping and then calls `bailoutOnAlreadyFinishedWork()`, which is the real bailout entry.
+6. In `bailoutOnAlreadyFinishedWork()`, we check if the fiber's children has pending work. If not, we bail out and return `null` to signal the end of the current render. If there are pending work, we clone its child fibers and return them for further processing.
+7. Back into our example, the steps 4, 5, and 6 are repeated for `<A />` and `<B />`.
+8. When we reach `<Counter />`, the props are equal, but there's a pending update on the fiber. So we enter the `updateFunctionComponent()` with `didReceiveUpdate === false` and start the reconciliation process for `<Counter />`.
+
+```jsx
+function App() {
+  return (
+    <A>
+      <B>
+        <Counter />
+      </B>
+
+      <C />
+    </A>
+  )
+}
+
+function Counter() {
+  const [count, setCount] = useState(0)
+
+  return (
+    <div>
+      <button onClick={() => setCount(count + 1)}>{count}</button>
+      <D />
+    </div>
+  )
+}
+```
+
+There are two types of bail out:
+
+1. Without entering `updateFunctionComponent()`, no updates on this fiber.
+2. After entering `updateFunctionComponent()`.
 
 ## Random Notes
 
