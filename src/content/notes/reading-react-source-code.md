@@ -22,12 +22,12 @@ Return value of `React.createElement`, always an object.
 
 ### Fiber
 
-According to the code comment: a `Fiber` is work on a `Component` that needs to be done or was done. However, a `Fiber` also represents a React component in the React tree.
+According to comments from the source code: a `Fiber` is work on a `Component` that needs to be done or was done. However, a `Fiber` also represents a React component in the React tree.
 
 So a `Fiber` has two dimensions of meaning:
 
-1. The work to be done or was done.
-2. The internal representation of React components (like VNode) in your React app.
+1. Virtual Node - The internal representation of React components in your React app.
+2. Node-bound Work - The work to be done or was done on the node.
 
 Notably, all `Fiber` nodes are processed by [`beginWork()`](https://github.com/facebook/react/blob/main/packages/react-reconciler/src/ReactFiberBeginWork.js#L3769), the return value of which decides the next step of the reconciliation process:
 
@@ -63,7 +63,8 @@ type Fiber = {
   // The props used to create the output.
   memoizedProps: any
 
-  // A struct to manage updates, like state updates and callbacks such as passive effects.
+  // A struct to manage updates,
+  // like state updates and callbacks.
   updateQueue: any
 
   // The state used to create the output,
@@ -80,13 +81,15 @@ type Fiber = {
   mode: TypeOfMode
 
   // Effects
+  // NOTE: This does not refer to the effects from `useEffect()`.
+  // But the effects of this fiber, like `Placement`, `Update`, `Deletion`.
   flags: Flags
   subtreeFlags: Flags
   deletions: Array<Fiber> | null
 
-  // Priority level of this fiber.
+  // Priority level of the work on this fiber.
   lanes: Lanes
-  // Priority level of the subtree.
+  // Priority level of the work on the subtree.
   childLanes: Lanes
 
   // This is a pooled version of a Fiber. Every fiber that gets updated will
@@ -102,17 +105,19 @@ type Fiber = {
 
 ```ts
 interface Hook {
-  memoizedState: any // The current state it holds
-  baseState: any // The initial state or the base state from which updates are derived
-  queue: UpdateQueue | null // An object to manage updates
-  baseQueue: UpdateQueue | null // An object to manage rebase updates
-  next: Hook | null // Form a linked list
+  memoizedState: any // The current state it holds. This is the value returned by the hook, and consumed by the component.
+  baseState: any // The initial state or the base state from which updates are derived. It is calculated during last render.
+
+  queue: UpdateQueue | null // An object to manage updates on this hook. IMO `updateCtx` would be a better name.
+  baseQueue: UpdateQueue | null // Similar to `queue`, but manages rebase updates.
+
+  next: Hook | null // Form a linked list.
 }
 ```
 
 ### UpdateQueue
 
-An `UpdateQueue` is an object that manages updates for a `Hook`.
+`UpdateQueue` is the object that manages updates for its `Hook`.
 
 ```ts
 interface UpdateQueue<S, A> {
@@ -142,7 +147,45 @@ First, here's how the update gets scheduled:
 5. If the two props are equal, and there are no updates detected on the fiber, we will enter `attemptEarlyBailoutIfNoScheduledUpdate()`. This function does some bookkeeping and then calls `bailoutOnAlreadyFinishedWork()`, which is the real bailout entry.
 6. In `bailoutOnAlreadyFinishedWork()`, we check if the fiber's children has pending work. If not, we bail out and return `null` to signal the end of the current render. If there are pending work, we clone its child fibers and return them for further processing.
 7. Back into our example, the steps 4, 5, and 6 are repeated for `<A />` and `<B />`.
-8. When we reach `<Counter />`, the props are equal, but there's a pending update on the fiber. So we enter the `updateFunctionComponent()` with `didReceiveUpdate === false` and start the reconciliation process for `<Counter />`.
+8. When we reach `<Counter />`, the props are equal, but there's a pending update on the fiber. So we enter the `updateFunctionComponent()` with `didReceiveUpdate === false` (spoiler: for now).
+9. In `updateFunctionComponent()`, before determining if a bailout is possible, we first call `renderWithHooks()`, which calls the function component and thus the hooks.
+   - ```jsx
+     // NOTE: There is a side effect,
+     // which could mutate the `didReceiveUpdate` flag.
+     function renderWithHooks() {
+       // ...
+       // Here we call the function component.
+       let children = __DEV__
+         ? callComponentInDEV(Component, props, secondArg)
+         : Component(props, secondArg)
+       // ...
+     }
+     ```
+10. `useState()` eventually retrieves the `updateReducerImpl()` function. Call chain: `useState() -> updateState() -> updateReducer() -> updateReducerImpl()`.
+11. In `updateReducerImpl()`, `newState` is calculated from the queued updates and compared with the current `hook.memoizedState`. Since the two states are different, `markWorkInProgressReceivedUpdate()` is called and now `didReceiveUpdate === true`.
+12. Back to `updateFunctionComponent()`, after `renderWithHooks()` we have `didReceiveUpdate` as `true`, so we enter the reconciliation process of the `Fiber` children of `<Counter />`.
+
+    - ```jsx
+      function updateFunctionComponent() {
+        // ...
+        // When `didReceiveUpdate` is `true`, we don't bailout the reconciliation.
+        if (current !== null && !didReceiveUpdate) {
+          bailoutHooks(current, workInProgress, renderLanes)
+          return bailoutOnAlreadyFinishedWork(
+            current,
+            workInProgress,
+            renderLanes,
+          )
+        }
+
+        // ...
+
+        workInProgress.flags |= PerformedWork
+        // Enter the reconciliation.
+        reconcileChildren(current, workInProgress, nextChildren, renderLanes)
+        return workInProgress.child
+      }
+      ```
 
 ```jsx
 function App() {

@@ -115,6 +115,10 @@ a.prose-heading-anchor:hover {
   @apply font-light;
 }
 
+.prose ol p:not(:where([class~='not-prose'], [class~='not-prose'] *)) {
+  @apply my-2;
+}
+
 .prose ul:not(:where([class~='not-prose'], [class~='not-prose'] *)) {
   padding-inline-start: 1em;
 }
