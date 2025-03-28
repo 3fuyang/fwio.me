@@ -16,25 +16,30 @@ draft: true
 
 ### ReactElement
 
-Return value of `React.createElement`, always an object.
+Return value of `React.createElement`, always an object but not a `Fiber` yet.
 
-> [!NOTE] > `ReactNode` is the set of all possible return values of a component.
+> [!NOTE]
+> `ReactNode` is the set of all possible return values of a component.
 
 ### Fiber
 
-According to comments from the source code: a `Fiber` is work on a `Component` that needs to be done or was done. However, a `Fiber` also represents a React component in the React tree.
+According to [the comments](https://github.com/facebook/react/blob/45463ab3ac3ed0e65dfdbbfd5e53a50a8384e909/packages/react-reconciler/src/ReactInternalTypes.js#L88) from the source code: a `Fiber` is work on a `Component` that needs to be done or was done. However, a `Fiber` also represents a React component in the React tree.
 
-So a `Fiber` has two dimensions of meaning:
+Thus a `Fiber` has two dimensions of meaning:
 
-1. Virtual Node - The internal representation of React components in your React app.
-2. Node-bound Work - The work to be done or was done on the node.
+1. Virtual DOM - The core internal data structure that tracks all the current component instances in the application.
+2. Node-level Work - The work scheduled to be done or was done on the node.
+
+> According to [Mark's Dev Blog](https://blog.isquaredsoftware.com/2020/05/blogged-answers-a-mostly-complete-guide-to-react-rendering-behavior/#rendering-process-overview), the term "Virtual DOM" was popularized to state that React does not create DOM nodes on every render, but no longer makes since modern frameworks assume no unnecessary DOM node creation.
 
 Notably, all `Fiber` nodes are processed by [`beginWork()`](https://github.com/facebook/react/blob/main/packages/react-reconciler/src/ReactFiberBeginWork.js#L3769), the return value of which decides the next step of the reconciliation process:
 
 - `Fiber` - Keep processing the next fiber (work).
 - `null` - We should stop and finish the current render.
 
-A few key fields of the `Fiber` structure:
+> Reconciliation - The process of diffing render trees and collecting all the changes to be applied to reflect the updates in the UI.
+
+The following are some key fields of the `Fiber` structure:
 
 ```ts
 type Fiber = {
@@ -43,15 +48,18 @@ type Fiber = {
 
   // The local state associated with this fiber,
   // e.g. DOM node for `HostComponent`,
-  // or instance for `ClassComponent`.
+  //      instance for `ClassComponent`.
   stateNode: any
 
-  // The `Fiber` to return to after finishing processing(dfs) this one.
+  // The `Fiber` to return to after finishing processing(dfs) this one,
+  // most of the time it's the parent fiber.
   return: Fiber | null
 
   // Singly Linked List Tree Structure.
   child: Fiber | null
   sibling: Fiber | null
+  // The index of the fiber in the parent's children array,
+  // used in reconciliation.
   index: number
 
   // The ref last used to attach this node.
@@ -99,6 +107,12 @@ type Fiber = {
 }
 ```
 
+### Paint
+
+This is not a React term but a browser concept. I put it here because it's important to first understand that it's we give the browser a chance to paint instead of we force it to do so. It's under browser's full control after all.
+
+The real DOM nodes are already created or updated in the `commit` phase. Yeah, we can read and measure the latest DOM nodes at this moment (usually in `useLayoutEffect`) to do some side effects or even trigger another re-render (P.S. these re-renders will be run synchronously to avoid a partial UI), but the screen is not refreshed until we finally yield the JavaScript execution, and the browser will use this opportunity to actually paint.
+
 ### Hooks
 
 `Hook`s are stored as a linked list on the `memoizedState` field of a Function Component's `Fiber`.
@@ -111,7 +125,7 @@ interface Hook {
   queue: UpdateQueue | null // An object to manage updates on this hook. IMO `updateCtx` would be a better name.
   baseQueue: UpdateQueue | null // Similar to `queue`, but manages rebase updates.
 
-  next: Hook | null // Form a linked list.
+  next: Hook | null // Singly linked list.
 }
 ```
 
@@ -125,7 +139,9 @@ interface UpdateQueue<S, A> {
   lanes: Lanes
   /** The `dispatch` function is **stable** across the component lifetime. */
   dispatch: (A => any) | null
+  /** The reducer used in the last render. */
   lastRenderedReducer: ((S, A) => S) | null
+  /** The state produced by the last render, which is compared with the current state to determine if we could skip the re-render. */
   lastRenderedState: S | null
 }
 ```
