@@ -138,6 +138,31 @@ Let's first recall how a typical React 18 app consisting of function components 
 
 Imagine a minimal counter app: the `<Counter />` component lies in the downstream of the tree, and a click event handler schedules an update on the `Fiber` of this component.
 
+```jsx
+function App() {
+  return (
+    <A>
+      <B>
+        <Counter />
+      </B>
+
+      <C />
+    </A>
+  )
+}
+
+function Counter() {
+  const [count, setCount] = useState(0)
+
+  return (
+    <div>
+      <button onClick={() => setCount(count + 1)}>{count}</button>
+      <D />
+    </div>
+  )
+}
+```
+
 First, here's how the update gets scheduled:
 
 1. The `onClick` handler calls `setState()`, which calls the React builtin dispatcher function. Call chain: `setState() -> dispatchSetState() -> dispatchSetStateInternal() -> scheduleUpdateOnFiber()`.
@@ -186,31 +211,6 @@ First, here's how the update gets scheduled:
         return workInProgress.child
       }
       ```
-
-```jsx
-function App() {
-  return (
-    <A>
-      <B>
-        <Counter />
-      </B>
-
-      <C />
-    </A>
-  )
-}
-
-function Counter() {
-  const [count, setCount] = useState(0)
-
-  return (
-    <div>
-      <button onClick={() => setCount(count + 1)}>{count}</button>
-      <D />
-    </div>
-  )
-}
-```
 
 There are two types of bail out:
 
