@@ -39,6 +39,7 @@
     "@astrojs/check": "^0.9.4",
     "@astrojs/markdown-remark": "^6.3.1",
     "@eslint-react/eslint-plugin": "^1.38.4",
+    "@eslint/js": "^9.23.0",
     "@ianvs/prettier-plugin-sort-imports": "^4.4.1",
     "@tailwindcss/typography": "^0.5.16",
     "@types/eslint-plugin-tailwindcss": "^3.17.0",

@@ -3,7 +3,6 @@ import react from '@eslint-react/eslint-plugin'
 import pluginJs from '@eslint/js'
 import * as tsParser from '@typescript-eslint/parser'
 import eslintPluginAstro from 'eslint-plugin-astro'
-// @ts-expect-error
 import hooksPlugin from 'eslint-plugin-react-hooks'
 import globals from 'globals'
 import tseslint from 'typescript-eslint'
