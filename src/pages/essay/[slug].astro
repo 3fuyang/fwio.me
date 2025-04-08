@@ -11,19 +11,21 @@ export async function getStaticPaths() {
     params: {
       slug,
     },
-    props: {
+    props: Object.assign(data, {
       render,
-      title: data.title,
-    },
+    }),
   }))
 }
 
-const { render, title } = Astro.props
+const { render, title, lang = 'en' } = Astro.props
 
 const { Content } = await render()
 ---
 
-<MarkdownLayout title={`${title} | Fwio`}>
-  <h1>{title}</h1>
+<MarkdownLayout
+  lang={lang === 'zh' ? 'zh-CN' : 'en-US'}
+  title={`${title} | Fwio`}
+>
+  <h1 class="text-2xl font-semibold text-pretty md:text-3xl">{title}</h1>
   <Content />
 </MarkdownLayout>

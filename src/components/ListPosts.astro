@@ -47,7 +47,8 @@ function groupPostsByYear(posts: Post[]) {
         </h2>
         <div class="space-y-6">
           {posts.map(({ slug, data: { title, pubDate } }) => {
-            const dateTime = new Date(pubDate).toLocaleDateString()
+            const dateTime = new Date(pubDate).toLocaleDateString('en-US')
+
             return (
               <article>
                 <a
@@ -57,9 +58,13 @@ function groupPostsByYear(posts: Post[]) {
                     'text-foreground/90 hover:text-foreground focus-visible:text-foreground',
                     'block',
                     'transition-colors',
+                    'group',
                   ]}
                 >
-                  <h3 title={title} class="truncate text-base tracking-wide">
+                  <h3
+                    title={title}
+                    class="truncate text-base tracking-wide underline-offset-4 group-hover:underline group-focus-visible:underline"
+                  >
                     {title}
                   </h3>
                   <time

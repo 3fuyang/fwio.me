@@ -2,14 +2,14 @@
 
 /* Define background and scrollbar style. */
 :root {
-  @apply bg-background font-light transition-colors;
+  @apply bg-background transition-colors;
 
   --c-scrollbar: oklch(86.2% 0.0101 305.38);
   --c-scrollbar-hover: oklch(70.02% 0.0261 290.81);
   --c-scrollbar-active: oklch(57.27% 0 0);
 
   font-family:
-    'Geist Variable', sans-serif, 'PingFang SC', 'HarmonyOS_Regular',
+    'IBM Plex Sans Variable', sans-serif, 'PingFang SC', 'HarmonyOS_Regular',
     'Helvetica Neue', 'Microsoft YaHei';
 }
 
@@ -54,14 +54,22 @@ img {
   @apply rounded-md select-none;
 }
 
-a.prose-heading-anchor {
+#home-link {
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+.prose
+  a.prose-heading-anchor:not(
+    :where([class~='not-prose'], [class~='not-prose'] *)
+  ) {
   color: inherit;
   transition: all 0.2s ease;
   text-decoration: none;
   text-decoration-thickness: 2px;
 }
 
-a.prose-heading-anchor:hover {
+a.prose-heading-anchor:hover,
+a.prose-heading-anchor:focus-visible {
   text-decoration: underline;
 }
 
@@ -111,10 +119,6 @@ a.prose-heading-anchor:hover {
   padding-inline-start: 0.75em;
 }
 
-.prose p:not(:where([class~='not-prose'], [class~='not-prose'] *)) {
-  @apply font-light;
-}
-
 .prose ol p:not(:where([class~='not-prose'], [class~='not-prose'] *)) {
   @apply my-2;
 }
@@ -128,8 +132,8 @@ a.prose-heading-anchor:hover {
 }
 
 .prose a:not(:where([class~='not-prose'], [class~='not-prose'] *)) {
-  @apply font-light;
-  text-underline-offset: 0.2em;
+  @apply font-normal underline;
+  text-underline-offset: 0.25em;
 }
 
 .prose a:not(:where([class~='not-prose'], [class~='not-prose'] *)):has(code) {

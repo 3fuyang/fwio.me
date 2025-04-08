@@ -1,5 +1,5 @@
 ---
-import '@fontsource-variable/geist-mono'
+import '@fontsource/ibm-plex-mono'
 import BaseLayout from './BaseLayout.astro'
 import './MarkdownLayout.css'
 
@@ -7,14 +7,15 @@ interface Props {
   title: string
   keywords?: string[]
   description?: string
+  lang?: string
 }
 
-const { title, keywords, description } = Astro.props
+const { title, keywords, description, lang } = Astro.props
 ---
 
-<BaseLayout {...{ title, keywords, description }}>
+<BaseLayout {...{ title, keywords, description, lang }}>
   <article
-    class="prose prose-base prose-cyan dark:prose-sky dark:prose-invert prose-p:text-pretty mx-auto"
+    class="prose prose-base prose-slate dark:prose-invert prose-p:text-pretty mx-auto max-w-prose"
   >
     <slot />
   </article>

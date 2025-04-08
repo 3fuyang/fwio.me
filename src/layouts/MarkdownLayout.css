@@ -9,7 +9,7 @@
   counter-reset: step;
   counter-increment: step 0;
 
-  font-family: 'Geist Mono Variable', monospace;
+  font-family: 'IBM Plex Mono', monospace;
 }
 .prose code .line::before {
   content: counter(step);

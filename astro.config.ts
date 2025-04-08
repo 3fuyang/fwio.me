@@ -18,7 +18,7 @@ const SITE = 'https://www.fwio.me'
 // https://astro.build/config
 export default defineConfig({
   prefetch: {
-    prefetchAll: false
+    prefetchAll: false,
   },
   site: SITE,
   vite: {

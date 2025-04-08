@@ -1,6 +1,6 @@
 ---
 import { Image } from 'astro:assets'
-import '@fontsource-variable/geist'
+import '@fontsource-variable/ibm-plex-sans'
 import Footer from '@/components/Footer.astro'
 import NavBar from '@/components/NavBar.astro'
 import Seagull from '../../public/seagull.svg'
@@ -19,16 +19,18 @@ interface Props {
   title: string
   keywords?: string[]
   description?: string
+  lang?: string
 }
 
 const {
   title,
   keywords = ['fwio', 'blog', 'ts', 'typescript', 'vue', 'react'],
   description = 'UN JOUR JE SERAI DE RETOUR PRÈS DE TOI',
+  lang = 'en-US',
 } = Astro.props
 ---
 
-<html lang="en-US">
+<html lang={lang}>
   <head>
     <title>{title}</title>
     <meta name="robots" content="index, follow" />
@@ -93,7 +95,7 @@ const {
   <body>
     <div class="scroll-smooth">
       <NavBar />
-      <main class="min-h-[calc(100vh_-_3rem)] items-stretch px-6 py-10">
+      <main class="min-h-[calc(100vh_-_3rem)] items-stretch px-6 py-10 bg-background">
         <slot />
         <Footer />
       </main>

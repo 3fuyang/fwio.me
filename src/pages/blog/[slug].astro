@@ -19,7 +19,14 @@ export async function getStaticPaths() {
   }))
 }
 
-const { render, title, keywords, description, pubDate } = Astro.props
+const {
+  render,
+  title,
+  keywords,
+  description,
+  pubDate,
+  lang = 'en',
+} = Astro.props
 
 const { Content, headings, remarkPluginFrontmatter } = await render()
 
@@ -33,11 +40,15 @@ const concatenatedHeadings = [
 ]
 ---
 
-<MarkdownLayout title={`${title} | Fwio`} {...{ keywords, description }}>
-  <h1 class="text-2xl font-bold">{title}</h1>
+<MarkdownLayout
+  lang={lang === 'zh' ? 'zh-CN' : 'en-US'}
+  title={`${title} | Fwio`}
+  {...{ keywords, description }}
+>
+  <h1 class="text-2xl font-semibold text-pretty md:text-3xl">{title}</h1>
   <section class="text-muted-foreground flex items-center space-x-6 text-sm">
     <time datetime={new Date(pubDate).toISOString()}
-      >{new Date(pubDate).toLocaleDateString()}</time
+      >{new Date(pubDate).toLocaleDateString('en-US')}</time
     >
     <div class="flex items-center space-x-2">
       <ClockIcon className="size-4" />
