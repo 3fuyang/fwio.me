@@ -6,17 +6,17 @@ description: How to mock file response with MSW.
 lang: en
 ---
 
-I've been using MSW since 2023 and it's been a good time, but most of time I was just mocking simple REST APIs - JSON comes, JSON goes, that's it.
+I've been using MSW since 2023, and it's been a great experience. Most of the time, though, I was just mocking straightforward REST APIs - JSON in, JSON out, nothing fancy.
 
-But recently, I'm working on a feature which involves a file endpoint. Just like it always happens, I started prototyping it, and I need an API mock to simulate the flow.
+Recently, I started working on a feature that involves a file endpoint. As usual, I began by prototyping and needed a mock API to simulate the flow.
 
-Before being trapped by any hyper-tooling investigation, I'm fully aware that MSW is a great and mature library, and of course it provides relevant APIs for my case.
+Before diving into any hyper-tooling rabbit holes, I want to acknowledge that MSW is a solid, mature library - and yes, it absolutely provides the right APIs for this kind of use case.
 
-In [responding-with-binary-data](https://mswjs.io/docs/recipes/responding-with-binary-data), it illustrates that the easiest way to obtain a buffer **in the browser** is to **fetch** the resource you need and read its body as `response.arrayBuffer()`.
+In the [responding-with-binary-data](https://mswjs.io/docs/recipes/responding-with-binary-data) guide, it explains that the simplest way to obtain a buffer **in the browser** is by **fetching** the resource and using `response.arrayBuffer()` to read the body.
 
-That is very enlightening to me, especially when I was just starting to be confused about how to call `fs.readFile()` in a module which is gonna be consumed in a service worker.
+That was a lightbulb moment for me - especially since I was just starting to puzzle over how to use `fs.readFile()` in a module that's going to run in a service worker.
 
-So I copy paste a random file from my computer to the `mocks` folder and simply request it with `fetch` in my handler.
+So, I copied a random file from my machine to the `mocks` folder and simply fetched it inside my handler. Done and dusted.
 
 ```ts
 export const fileHandler = http.get('/files/:fileId', async () => {
