@@ -6,7 +6,7 @@ description: How to mock file response with MSW.
 lang: en
 ---
 
-I've been using MSW since 2023, and it's been a great experience. Most of the time, though, I was just mocking straightforward REST APIs - JSON in, JSON out, nothing fancy.
+I've been using [MSW](https://mswjs.io) since 2023, and it's been a great experience. Most of the time, though, I was just mocking straightforward REST APIs - JSON in, JSON out, nothing fancy.
 
 Recently, I started working on a feature that involves a file endpoint. As usual, I began by prototyping and needed a mock API to simulate the flow.
 
