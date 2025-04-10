@@ -4,6 +4,7 @@ import '@fontsource-variable/ibm-plex-sans'
 import Footer from '@/components/Footer.astro'
 import NavBar from '@/components/NavBar.astro'
 import Seagull from '../../public/seagull.svg'
+import ibmPlexSansWoff2 from '@fontsource-variable/ibm-plex-sans/files/ibm-plex-sans-latin-wght-normal.woff2?url';
 import '../styles/main.css'
 import '../styles/global.css'
 
@@ -44,6 +45,7 @@ const {
     <link rel="icon" type="image/svg+xml" href="/fwio.svg" />
     <link rel="apple-touch-icon" href="/fwio-apple-touch.png" sizes="180x180" />
     <link rel="mask-icon" href="/fwio.svg" color="#FFFFFF" />
+    <link rel="preload" as="font" type="font/woff2" href={ibmPlexSansWoff2} crossorigin="anonymous" />
     {isProd && <link rel="preconnect" href="https://www.googletagmanager.com" />}
     <slot name="head" />
     <script is:inline>
