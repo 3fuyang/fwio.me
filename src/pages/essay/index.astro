@@ -1,5 +1,4 @@
 ---
-import ListPosts from '@/components/ListPosts.astro'
 import BaseLayout from '@/layouts/BaseLayout.astro'
 import { getCollection } from 'astro:content'
 
@@ -16,5 +15,48 @@ const posts = allBlogPosts
 ---
 
 <BaseLayout title="Essay | Fwio">
-  <ListPosts {...{ posts }} />
+  <div class="mx-auto max-w-xl">
+    <section class="relative py-4">
+      <h2
+        class="year-marker pointer-events-none absolute top-0 left-0 text-4xl text-transparent opacity-50 select-none"
+      >
+        2666
+      </h2>
+      <div class="space-y-6">
+        {
+          posts.map(({ slug, data: { title, pubDate } }) => {
+            const dateTime = new Date(pubDate).toLocaleDateString('en-US')
+
+            return (
+              <article>
+                <a
+                  href={slug}
+                  class:list={[
+                    'ml-2 block rounded-sm px-1',
+                    'text-foreground/90 hover:text-foreground focus-visible:text-foreground',
+                    'block',
+                    'transition-colors',
+                    'group',
+                  ]}
+                >
+                  <h3
+                    title={title}
+                    class="truncate text-base tracking-wide underline-offset-4 group-hover:underline group-focus-visible:underline"
+                  >
+                    {title}
+                  </h3>
+                  <time
+                    class="text-foreground/60 text-xs sm:text-sm"
+                    datetime={dateTime}
+                  >
+                    {dateTime}
+                  </time>
+                </a>
+              </article>
+            )
+          })
+        }
+      </div>
+    </section>
+  </div>
 </BaseLayout>
