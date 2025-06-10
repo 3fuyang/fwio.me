@@ -1,0 +1,172 @@
+---
+title: How Jotai works under the hood
+pubDate: 2025-06-10T12:00:00.000+08:00
+keywords: ['react', 'state management', 'jotai', 'source code reading']
+description: What I learned from reading Jotai's code, mostly about its reactivity implementation in this post.
+lang: en
+draft: true
+---
+
+import { Image } from 'astro:assets'
+import atomsDiagramDark from '../../assets/how-jotai-works-under-the-hood/atoms-in-jotai-dark.svg'
+import atomsDiagramLight from '../../assets/how-jotai-works-under-the-hood/atoms-in-jotai.svg'
+
+> This post is based on Jotai v2.12.5. The implementation could have changed in future versions.
+
+As mentioned in my [last post](/blog/ts-generic-type-vs-generic-function-type), recently I was learning [Jotai](https://jotai.org)'s implementation. Despite the trend of Zustand replacing traditional Redux, which is on fire, **Jotai** is another **growing statement management library** that are gaining more and more witnesses as RSC and SSR getting promoted by React and meta-frameworks these days.
+
+Although the feature that differs Jotai the best from alternatives is its [Suspense integration](https://jotai.org/docs/guides/async#suspense), I believe the **core reactivity model** of Jotai is more crucial for understanding the library and React state management stuffs better. And that's what this post is going to written about.
+
+> I also planed to write another post about how async states are handled by Jotai.
+
+## Where to start?
+
+I learned from [Alex Kondov](https://alexkondov.com/reading-source-code-redux/#diving-into-redux) that **starting from the public APIs**, especially the ones that we are mostly familiar with, is a great strategy to start exploring a library's code base. This keeps you consistent on what exactly you are trying to figure out (the ins and outs of the API), rather than distracted by various magics that don't come together at first glance.
+
+For Jotai, the [`atom()`](https://jotai.org/docs/core/atom) function and [`useAtom()`](https://jotai.org/docs/core/use-atom) hook are definitely the best for this. The `atom()` function creates an atom config (metadata of a global state) and the `useAtom()` hook is called to read and write the atom, just like the `useState()` for global states.
+
+```ts
+const countAtom = atom(0)
+function Component() {
+  const [count, setCount] = useAtom(countAtom)
+  const inc = () => setCount((c) => c + 1)
+  // ...
+}
+```
+
+## Overview of the Atoms Model
+
+Before digging into details, let's first grab an overview of how atoms live in Jotai.
+
+<Image
+  className="block dark:hidden"
+  src={atomsDiagramLight}
+  alt="How atoms live in Jotai"
+/>
+
+<Image
+  className="hidden dark:block"
+  src={atomsDiagramDark}
+  alt="How atoms live in Jotai"
+/>
+
+As shown in the diagram, an `atom` does not hold any value but is actually a config of the global state. Meanwhile, the value we really consume lies in the `atomState` **instantiated** with the `atom` config within a `store`.
+
+The [`store`](https://jotai.org/docs/core/store) is the most important and complicated object in the whole system. It serves as the **external store** that makes states **global** (stored at a single place and accessible anywhere, even outside React!), and meanwhile is responsible for **managing the reactivity** (dependency tracks, invalidations, update propagation, etc.).
+
+## Create an Atom
+
+To create an atom, you call `atom()` and pass different parameters according to your needs.
+
+```ts
+// primitive atom
+const primitiveAtom = atom(0)
+// read-only derived atom
+const readOnlyAtom = atom((get) => get(primitiveAtom) * 2)
+// writable derived atom
+const writableAtom = atom(
+  (get) => get(readOnlyAtom),
+  (_get, set, v) => set(primitiveAtom, v / 2),
+)
+// write-only derived atom
+const writeOnlyAtom = atom(null, (_get, set, v) => set(countAtom, v / 2))
+```
+
+To support this kind of flexibility, `atom()` is implemented as an [**overloaded** function](https://github.com/pmndrs/jotai/blob/f0e3d953d6f75e7bdd0a0d18360c471bc64f4058/src/vanilla/atom.ts#L100), which determines its own type when called with specific parameters.
+
+And as you can see from these overload signatures, overloaded `atom()` does not only accept different parameters, but also **returns different kind of atom types**:
+
+```ts
+// read-only derived atom
+export function atom<Value>(read: Read<Value>): Atom<Value>
+
+// primitive atom
+export function atom<Value>(
+  initialValue: Value,
+): PrimitiveAtom<Value> & WithInitialValue<Value>
+
+// writable derived atom
+export function atom<Value, Args extends unknown[], Result>(
+  read: Read<Value, SetAtom<Args, Result>>,
+  write: Write<Args, Result>,
+): WritableAtom<Value, Args, Result>
+
+// other overloads...
+```
+
+You see, we got `Atom`, `PrimitiveAtom` and `WritableAtom`. They certainly represent different types of atoms, consisting of different properties. A benefit for this is that on the consumer side, the return type of overloaded `useAtom()` is accurate with the passed atom, turning out to be very convenient for users. This is also [approved by Daishi](https://newsletter.daishikato.com/p/how-jotai-hooks-use-function-overload-in-typescript), the creator of Jotai.
+
+## Atom Internals
+
+Of course, more than just better API ergonomics, these different atom types serve for **different purposes** and will be **handled differently** during read and write process.
+
+Now let's have a look at the [type definition for atoms](https://github.com/pmndrs/jotai/blob/main/src/vanilla/atom.ts#L42):
+
+```ts
+interface Atom<Value> {
+  read: Read<Value>
+}
+
+interface WritableAtom<Value, Args extends unknown[], Result>
+  extends Atom<Value> {
+  read: Read<Value, SetAtom<Args, Result>>
+  write: Write<Args, Result>
+}
+
+type PrimitiveAtom<Value> = WritableAtom<Value, [SetStateAction<Value>], void>
+
+// This is an internal type and not part of public API.
+// Do not depend on it as it can change without notice.
+type WithInitialValue<Value> = {
+  init: Value
+}
+```
+
+> **Note:** For simplicity, I removed the properties that have nothing to do with basic reactivity but are mostly for **debugging** and **async states**.
+
+Checking with the ["Create an Atom"](#create-an-atom) part, the minimal `Atom` is created by specifying only a `read` function, and a general `WritableAtom` is created by providing both the `read` and `write` function.
+
+And surprisingly, `PrimitiveAtom` is the most concrete one, even more specific than `WritableAtom`, which is not **primitive** at all!
+
+I kept the comments for `WithInitialValue` from the source code. I think this type exists simply because it's not worth it to define another atom type for those with initial values. So it's just a trivial internal type!
+
+> So a point here is that the division of **primitive atoms** or **derived atoms** is simply decided by how we **created** the atom config. An atom being writable does not mean that this atom is necessarily derived or not.
+
+You will notice that there are a few [other types](https://github.com/pmndrs/jotai/blob/main/src/vanilla/atom.ts#L17), like `Read<Value>`, referenced by these atoms with type parameters passed to them:
+
+```ts
+/** User provided reader function */
+type Read<Value> = (get: Getter) => Value
+
+/** User provided writer function */
+type Write<Args extends unknown[], Result> = (
+  get: Getter,
+  set: Setter,
+  ...args: Args
+) => Result
+
+/** Just like what we pass to React state updaters, right? */
+type SetStateAction<Value> = Value | ((prev: Value) => Value)
+```
+
+And now you know what that long type parameter list `<Value, Args extends unknown[], Result>` means:
+
+- `Value` is the type of the value the `atom` defines.
+- `Args` and `Result` is used for the `write` function, allowing we specified **any** **arguments** (that's why `Args` is constrained by `unknown[]`) and **return value** we want, when updating atoms.
+
+These type parameters are used quite frequently in the code base, so we better know what they mean now. And yeah, turns out to be quite intuitive.
+
+Again, there are another two types `Getter` and `Setter`, referenced but not defined yet:
+
+```ts
+type Getter = <Value>(atom: Atom<Value>) => Value
+
+type Setter = <Value, Args extends unknown[], Result>(
+  atom: WritableAtom<Value, Args, Result>,
+  ...args: Args
+) => Result
+```
+
+They are simply what you call in your custom `read` of `write` functions, like `get(atom)` or `set(atom, value)`. However, they are probably the **most important** functions mentioned so far, but we will check them out later. At the moment, we just need to be aware that these two functions can be called with **any atoms**.
+
+That's the bare atoms' part, and please remember that we haven't even touched `atomState` for now! In next section, we will take a glimpse of `useAtom()` and directly dive into the boss🦖 room.

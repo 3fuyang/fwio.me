@@ -137,7 +137,7 @@ a.prose-heading-anchor:focus-visible {
 }
 
 .prose a:not(:where([class~='not-prose'], [class~='not-prose'] *)):has(code) {
-  @apply no-underline;
+  @apply underline-offset-2;
 }
 
 .prose img:not(:where([class~='not-prose'], [class~='not-prose'] *)) {
