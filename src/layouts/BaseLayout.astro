@@ -1,18 +1,10 @@
 ---
-import { Image } from 'astro:assets'
 import '@fontsource-variable/ibm-plex-sans'
 import Footer from '@/components/Footer.astro'
 import NavBar from '@/components/NavBar.astro'
-import Seagull from '../../public/seagull.svg'
 import ibmPlexSansWoff2 from '@fontsource-variable/ibm-plex-sans/files/ibm-plex-sans-latin-wght-normal.woff2?url';
 import '../styles/main.css'
 import '../styles/global.css'
-
-const { pathname } = Astro.url
-
-const isPost = ['blog/', 'notes/', 'essay/'].some((item) =>
-  pathname.includes(item),
-)
 
 const isProd = import.meta.env.PROD
 
@@ -21,20 +13,23 @@ interface Props {
   keywords?: string[]
   description?: string
   lang?: string
+  noIndex?: boolean
 }
 
 const {
   title,
   keywords = ['fwio', 'blog', 'ts', 'typescript', 'vue', 'react'],
-  description = 'UN JOUR JE SERAI DE RETOUR PRÈS DE TOI',
+  description = 'Write for myself, just for fun.',
   lang = 'en-US',
+  noIndex = false
 } = Astro.props
 ---
 
 <html lang={lang}>
   <head>
+    <slot name="head" />
     <title>{title}</title>
-    <meta name="robots" content="index, follow" />
+    <meta name="robots" content={noIndex ? "nofollow, noindex" : "index, follow"} />
     <meta name="description" content={description} />
     <meta charset="UTF-8" />
     <meta name="theme-color" content="#ffffff" />
@@ -47,7 +42,6 @@ const {
     <link rel="mask-icon" href="/fwio.svg" color="#FFFFFF" />
     <link rel="preload" as="font" type="font/woff2" href={ibmPlexSansWoff2} crossorigin="anonymous" />
     {isProd && <link rel="preconnect" href="https://www.googletagmanager.com" />}
-    <slot name="head" />
     <script is:inline>
       const THEME_LOCAL_STORAGE_KEY = 'usehooks-ts-ternary-dark-mode'
       const THEME_ENUM = {
@@ -101,7 +95,7 @@ const {
         <slot />
         <Footer />
       </main>
-      {
+      <!-- {
         !isPost && (
           <Image
             aria-hidden="true"
@@ -111,7 +105,7 @@ const {
             class="pointer-events-none fixed left-1/2 top-1/2 aspect-square h-auto max-w-[45%] -translate-x-1/2 -translate-y-1/2 opacity-45 md:max-w-[17%]"
           />
         )
-      }
+      } -->
     </div>
   </body>
 

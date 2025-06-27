@@ -1,10 +1,18 @@
 ---
-
+import BaseLayout from '@/layouts/BaseLayout.astro'
 ---
 
-<article class="m-auto max-w-xl text-4xl font-bold tracking-wide text-pretty">
-  UN JOUR <br />
-  JE SERAI <br />
-  DE RETOUR <br />
-  PRÈS DE TOI
-</article>
+<BaseLayout title="Page not found | Fwio" noIndex>
+  <div class="mx-auto max-w-xl py-10 text-center">
+    <h2 class="mb-4 font-mono text-5xl font-extralight">404</h2>
+    <p class="text-muted-foreground mb-2">
+      Oops, the link you used couldn't be found now🛸.
+    </p>
+    <p class="text-muted-foreground mb-2">
+      Please check the address or <a
+        class="underline decoration-dashed decoration-1 underline-offset-4"
+        href="/">head back home</a
+      >.
+    </p>
+  </div>
+</BaseLayout>
