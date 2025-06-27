@@ -18,7 +18,12 @@ const SITE = 'https://www.fwio.me'
 // https://astro.build/config
 export default defineConfig({
   prefetch: {
-    prefetchAll: false,
+    prefetchAll: true,
+    defaultStrategy: 'viewport',
+  },
+  experimental: {
+    contentIntellisense: true,
+    clientPrerender: true,
   },
   site: SITE,
   vite: {
