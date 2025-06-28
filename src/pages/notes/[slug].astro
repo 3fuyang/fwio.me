@@ -45,9 +45,14 @@ const concatenatedHeadings = [
   title={`${title} | Fwio`}
   {...{ keywords, description }}
 >
-  <h1 class="text-2xl font-semibold text-pretty md:text-3xl">{title}</h1>
+  <h1
+    transition:name="heading"
+    class="text-2xl font-semibold text-pretty md:text-3xl"
+  >
+    {title}
+  </h1>
   <section class="text-foreground/60 flex items-center space-x-6 text-sm">
-    <time datetime={new Date(pubDate).toISOString()}
+    <time transition:name="date" datetime={new Date(pubDate).toISOString()}
       >{new Date(pubDate).toLocaleDateString('en-US')}</time
     >
     <div class="flex items-center space-x-2">

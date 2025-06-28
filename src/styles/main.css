@@ -54,10 +54,6 @@ img {
   @apply rounded-md select-none;
 }
 
-#home-link {
-  font-family: 'IBM Plex Mono', monospace;
-}
-
 .prose
   a.prose-heading-anchor:not(
     :where([class~='not-prose'], [class~='not-prose'] *)

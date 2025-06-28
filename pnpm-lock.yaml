@@ -84,6 +84,9 @@ importers:
       '@tailwindcss/typography':
         specifier: ^0.5.16
         version: 0.5.16(tailwindcss@4.1.11)
+      '@types/dom-navigation':
+        specifier: ^1.0.5
+        version: 1.0.5
       '@types/eslint-plugin-tailwindcss':
         specifier: ^3.17.0
         version: 3.17.0
@@ -1435,6 +1438,9 @@ packages:
 
   '@types/debug@4.1.12':
     resolution: {integrity: sha512-vIChWdVG3LG1SMxEvI/AK+FWJthlrqlTu7fbrlywTkkaONwk/UAGaULXRlf8vkzFBLVm0zkMdCquhL5aOjhXPQ==}
+
+  '@types/dom-navigation@1.0.5':
+    resolution: {integrity: sha512-aM1Mr488jX62+6b9zdEtPHFnI7ILgvbII4BaBJMaqhhbDBupJJJ8+nXFVyQT1ptujOUAg6Sojkjk3j6rU73Bwg==}
 
   '@types/eslint-plugin-tailwindcss@3.17.0':
     resolution: {integrity: sha512-ucQGf2YIdTcndYcxRU3UdZgmhUHsOlbIF4BaRtl0op+7k2JmqM2i3aXZ6XIcfZgVq1ZKov7VM5c/BR81ukmkyg==}
@@ -5664,6 +5670,8 @@ snapshots:
   '@types/debug@4.1.12':
     dependencies:
       '@types/ms': 2.1.0
+
+  '@types/dom-navigation@1.0.5': {}
 
   '@types/eslint-plugin-tailwindcss@3.17.0':
     dependencies:
