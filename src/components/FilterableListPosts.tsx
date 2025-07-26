@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { flushSync } from 'react-dom'
 
 import NotesFilter from './NotesFilter'
 
@@ -26,16 +27,27 @@ export default function FilterableListPosts({
       <div className="mb-6">
         <NotesFilter
           onFilterChange={(filter) => {
-            setFilteredPosts(
-              posts.filter((post) => {
-                if (filter === 'all') {
-                  return true
-                } else if (filter === 'readings') {
-                  return isReadingNote(post.slug)
+            // eslint-disable-next-line @eslint-react/dom/no-flush-sync
+            flushSync(() => {
+              const filteredPosts = posts.filter((post) => {
+                switch (filter) {
+                  case 'all':
+                    return true
+                  case 'readings':
+                    return isReadingNote(post.slug)
+                  default:
+                    return !isReadingNote(post.slug)
                 }
-                return !isReadingNote(post.slug)
-              }),
-            )
+              })
+
+              if (document.startViewTransition) {
+                document.startViewTransition(() => {
+                  setFilteredPosts(filteredPosts)
+                })
+              } else {
+                setFilteredPosts(filteredPosts)
+              }
+            })
           }}
         />
       </div>
@@ -51,7 +63,11 @@ export default function FilterableListPosts({
               const postId = '_' + slug.split('/').at(-1)
 
               return (
-                <article key={slug} id={postId}>
+                <article
+                  key={slug}
+                  id={postId}
+                  style={{ viewTransitionName: postId }}
+                >
                   <a
                     href={slug}
                     className="ml-2 block rounded-sm px-1 text-foreground/90 hover:text-foreground focus-visible:text-foreground transition-colors group"
