@@ -1,5 +1,5 @@
 ---
-import ListPosts from '@/components/ListPosts.astro'
+import FilterableListPosts from '@/components/FilterableListPosts'
 import BaseLayout from '@/layouts/BaseLayout.astro'
 import { getCollection } from 'astro:content'
 
@@ -16,5 +16,110 @@ const posts = allBlogPosts
 ---
 
 <BaseLayout title="Notes | Fwio">
-  <ListPosts {...{ posts }} />
+  <FilterableListPosts posts={posts} client:load />
 </BaseLayout>
+
+<script>
+  window.addEventListener('pageswap', async (e) => {
+    const et = e as PageSwapEvent
+    if (!et.viewTransition) {
+      return
+    }
+
+    const targetUrl = new URL(et.activation!.entry.url!)
+
+    if (isPostPage(targetUrl)) {
+      const post = extractPostSlugFromUrl(targetUrl)
+
+      const heading = document.querySelector(
+        `#_${post} h3`,
+      ) as HTMLElement | null
+      const date = document.querySelector(
+        `#_${post} time`,
+      ) as HTMLElement | null
+
+      if (!heading || !date) {
+        return
+      }
+
+      setTemporaryViewTransitionNames(
+        [
+          [heading, 'heading'],
+          [date, 'date'],
+        ],
+        et.viewTransition.finished,
+      )
+    }
+  })
+
+  window.addEventListener('pagereveal', async (e) => {
+    const et = e as PageRevealEvent
+
+    if (!et.viewTransition || !(window.navigation as any)?.activation) {
+      return
+    }
+
+    const fromUrl = new URL(
+      ((window.navigation as any).activation as NavigationActivation).from
+        ?.url as string,
+    )
+    const currentUrl = new URL(
+      ((window.navigation as any).activation as NavigationActivation).entry
+        ?.url as string,
+    )
+
+    if (isPostPage(fromUrl) && isListPage(currentUrl)) {
+      const post = extractPostSlugFromUrl(fromUrl)
+
+      const heading = document.querySelector(
+        `#_${post} h3`,
+      ) as HTMLElement | null
+      const date = document.querySelector(
+        `#_${post} time`,
+      ) as HTMLElement | null
+
+      if (!heading || !date) {
+        return
+      }
+
+      setTemporaryViewTransitionNames(
+        [
+          [heading, 'heading'],
+          [date, 'date'],
+        ],
+        et.viewTransition.ready,
+      )
+    }
+  })
+
+  function isPostPage(url: URL) {
+    return /^\/blog|notes\/\w/.test(url.pathname)
+  }
+
+  function isListPage(url: URL) {
+    return ['/', '/blog', '/notes'].includes(url.pathname)
+  }
+
+  function extractPostSlugFromUrl(url: URL) {
+    try {
+      return url.pathname.split('/').at(-1) as string
+    } catch {
+      return ''
+    }
+  }
+
+  async function setTemporaryViewTransitionNames(
+    entries: [HTMLElement, string][],
+    vtPromise: Promise<void>,
+  ) {
+    for (const [$el, name] of entries) {
+      $el.style.viewTransitionName = name
+    }
+
+    await vtPromise
+
+    for (const [$el] of entries) {
+      $el.style.viewTransitionName = ''
+    }
+  }
+</script>
