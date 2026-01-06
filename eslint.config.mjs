@@ -3,11 +3,12 @@ import react from '@eslint-react/eslint-plugin'
 import pluginJs from '@eslint/js'
 import * as tsParser from '@typescript-eslint/parser'
 import eslintPluginAstro from 'eslint-plugin-astro'
-import hooksPlugin from 'eslint-plugin-react-hooks'
+import reactHooks from 'eslint-plugin-react-hooks'
+import { defineConfig } from 'eslint/config'
 import globals from 'globals'
 import tseslint from 'typescript-eslint'
 
-export default tseslint.config(
+export default defineConfig(
   {
     ignores: [
       'node_modules',
@@ -24,11 +25,7 @@ export default tseslint.config(
   pluginJs.configs.recommended,
   ...eslintPluginAstro.configs['flat/recommended'],
   tseslint.configs.eslintRecommended,
-  {
-    plugins: {
-      'react-hooks': hooksPlugin,
-    },
-  },
+  reactHooks.configs.flat.recommended,
   {
     files: ['**/*.{ts,tsx}'],
     ...react.configs.recommended,
