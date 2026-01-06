@@ -102,7 +102,6 @@ duration: 10min
 3. 保存修改，回到服务，先点击**重载配置**，再点击**重启**：
    1. 如果此时运行失败，出现：`bind() to 0.0.0.0:80 failed (98:Adress already in use)`错误，是由于**端口号被占用**。
 4. 在浏览器中访问“http://ip:port"，即可进入前端页面
-
    1. 主页可以正常访问，但**调用后端接口**时，提示错误 **We're sorry but XX doesn't work properly without JavaScript enabled**，原因是 **Nginx 配置异常，没有正确转发后端接口地址**。
    2. 需要在 Nginx 中配置**转发访问后端的具体地址**：
    3. ```js

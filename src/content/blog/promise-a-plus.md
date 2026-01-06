@@ -48,18 +48,15 @@ promise.then(onFulfilled, onRejected)
 ```
 
 1. `onFulfilled` 和 `onRejected` 都是**可选**参数：
-
    1. 如果 `onFulfilled` 不是函数，其应该被忽略；
    2. 如果 `onRejected` 不是函数，其应该被忽略。
 
 2. 如果 `onFulfilled` 是函数：
-
    1. 它必须在 promise 变为 `fulfilled` 后被调用，并以 promise 的结果值（`value`）作为第一个参数；
    2. 在 promise 变为 `fulfilled` 之前不能被调用；
    3. 最多只被调用一次。
 
 3. 如果 `onRejected` 是函数：
-
    1. 它必须在 promise 变为 `rejected` 后被调用，并以 promise 的理由（`reason`）作为第一个参数；
    2. 在 promise 变为 `rejected` 之前不能被调用；
    3. 最多只被调用一次。
@@ -71,12 +68,10 @@ promise.then(onFulfilled, onRejected)
 5. `onFulfilled` 和 `onRejected` 必须作为函数调用（没有 `this` 对象）。
 
 6. 在同一个 promise 上，`then` 可能被多次调用。
-
    1. 当 promise 处于 `fulfilled` 状态，所有相关的 `onFulfilled` 必须按照其 `then` 的调用顺序执行；
    2. 当 promise 处于 `rejected` 状态，所有相关的 `onRejected` 必须按照其 `then` 的调用顺序执行。
 
 7. `then` 必须返回一个 promise。
-
    1. ```js
       promise2 = promise1.then(onFulfilled, onRejected)
       ```

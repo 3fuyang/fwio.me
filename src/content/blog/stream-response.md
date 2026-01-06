@@ -1,7 +1,7 @@
 ---
 title: Stream Response
 description: draft
-lang: zh
+lang: en
 pubDate: 2024-05-29T17:59:00+08:00
 draft: true
 ---

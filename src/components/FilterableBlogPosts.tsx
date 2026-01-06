@@ -28,29 +28,29 @@ export default function FilterableBlogPosts({
       <div className="mb-6">
         <BlogFilter
           onFilterChange={(filter) => {
-            // eslint-disable-next-line @eslint-react/dom/no-flush-sync
-            flushSync(() => {
-              const filteredPosts = posts.filter((post) => {
-                switch (filter) {
-                  case 'all':
-                    return true
-                  case 'en':
-                    return post.data.lang === 'en'
-                  case 'zh':
-                    return post.data.lang === 'zh'
-                  default:
-                    return true
-                }
-              })
+            const filteredPosts = posts.filter((post) => {
+              switch (filter) {
+                case 'all':
+                  return true
+                case 'en':
+                  return post.data.lang === 'en'
+                case 'zh':
+                  return post.data.lang === 'zh'
+                default:
+                  return true
+              }
+            })
 
-              if (document.startViewTransition) {
+            if (document.startViewTransition) {
+              // eslint-disable-next-line @eslint-react/dom/no-flush-sync
+              flushSync(() => {
                 document.startViewTransition(() => {
                   setFilteredPosts(filteredPosts)
                 })
-              } else {
-                setFilteredPosts(filteredPosts)
-              }
-            })
+              })
+            } else {
+              setFilteredPosts(filteredPosts)
+            }
           }}
         />
       </div>

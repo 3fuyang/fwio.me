@@ -205,7 +205,6 @@ First, here's how the update gets scheduled:
 10. `useState()` eventually retrieves the `updateReducerImpl()` function. Call chain: `useState() -> updateState() -> updateReducer() -> updateReducerImpl()`.
 11. In `updateReducerImpl()`, `newState` is calculated from the queued updates and compared with the current `hook.memoizedState`. Since the two states are different, `markWorkInProgressReceivedUpdate()` is called and now `didReceiveUpdate === true`.
 12. Back to `updateFunctionComponent()`, after `renderWithHooks()` we have `didReceiveUpdate` as `true`, so we enter the reconciliation process of the `Fiber` children of `<Counter />`.
-
     - ```jsx
       function updateFunctionComponent() {
         // ...

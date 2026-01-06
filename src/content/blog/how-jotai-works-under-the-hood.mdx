@@ -1,10 +1,9 @@
 ---
 title: How Jotai works under the hood
-pubDate: 2025-06-10T12:00:00.000+08:00
+pubDate: 2025-07-12T12:00:00.000+08:00
 keywords: ['react', 'state management', 'jotai', 'source code reading']
 description: What I learned from reading Jotai's code, mostly about its reactivity implementation in this post.
 lang: en
-draft: true
 ---
 
 import { Image } from 'astro:assets'
@@ -170,3 +169,7 @@ type Setter = <Value, Args extends unknown[], Result>(
 They are simply what you call in your custom `read` of `write` functions, like `get(atom)` or `set(atom, value)`. However, they are probably the **most important** functions mentioned so far, but we will check them out later. At the moment, we just need to be aware that these two functions can be called with **any atoms**.
 
 That's the bare atoms' part, and please remember that we haven't even touched `atomState` for now! In next section, we will take a glimpse of `useAtom()` and directly dive into the boss🦖 room.
+
+## Consume Atoms
+
+Most of the time, we consume atoms within React components, which is by calling hooks like `useAtom()`.

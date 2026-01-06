@@ -12,7 +12,7 @@ Recently, I started working on a feature that involves a file endpoint. As usual
 
 Before diving into any hyper-tooling rabbit holes, I want to acknowledge that MSW is a solid, mature library - and yes, it absolutely provides the right APIs for this kind of use case.
 
-In the [responding-with-binary-data](https://mswjs.io/docs/recipes/responding-with-binary-data) guide, it explains that the simplest way to obtain a buffer **in the browser** is by **fetching** the resource and using `response.arrayBuffer()` to read the body.
+In the [responding-with-binary-data](https://mswjs.io/docs/http/mocking-responses/binary) guide, it explains that the simplest way to obtain a buffer **in the browser** is by **fetching** the resource and using `response.arrayBuffer()` to read the body.
 
 That was a lightbulb moment for me - especially since I was just starting to puzzle over how to use `fs.readFile()` in a module that's going to run in a service worker.
 
