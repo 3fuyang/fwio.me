@@ -28,7 +28,7 @@ export default function PostList({ posts, filters }: PostListProps) {
     }
 
     document.startViewTransition(() => {
-      // eslint-disable-next-line @eslint-react/dom/no-flush-sync
+      // eslint-disable-next-line @eslint-react/dom-no-flush-sync
       flushSync(() => setFilter(value))
     })
   }

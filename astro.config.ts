@@ -1,4 +1,4 @@
-import { rehypeHeadingIds } from '@astrojs/markdown-remark'
+import { rehypeHeadingIds, unified } from '@astrojs/markdown-remark'
 import mdx from '@astrojs/mdx'
 import react from '@astrojs/react'
 import vercel from '@astrojs/vercel'
@@ -40,26 +40,28 @@ export default defineConfig({
     shikiConfig: {
       theme: 'nord',
     },
-    remarkPlugins: [remarkReadingTime],
-    rehypePlugins: [
-      rehypeHeadingIds,
-      [
-        rehypeAutolinkHeadings,
-        {
-          behavior: 'wrap',
-          properties: {
-            className: 'prose-heading-anchor',
+    processor: unified({
+      remarkPlugins: [remarkReadingTime],
+      rehypePlugins: [
+        rehypeHeadingIds,
+        [
+          rehypeAutolinkHeadings,
+          {
+            behavior: 'wrap',
+            properties: {
+              className: 'prose-heading-anchor',
+            },
           },
-        },
+        ],
+        [
+          rehypeExternalLinks,
+          {
+            target: '_blank',
+            rel: ['nofollow', 'noopener', 'noreferrer'],
+          },
+        ],
       ],
-      [
-        rehypeExternalLinks,
-        {
-          target: '_blank',
-          rel: ['nofollow', 'noopener', 'noreferrer'],
-        },
-      ],
-    ],
+    }),
   },
   integrations: [react(), mdx()],
   output: 'static',
