@@ -1,7 +1,5 @@
 @import 'tailwindcss';
 
-@config '../../tailwind.config.mjs';
-
 @plugin '@tailwindcss/typography';
 @plugin 'tailwindcss-animate';
 
@@ -10,28 +8,15 @@
 @theme {
   --color-background: oklch(100% 0 106.37);
   --color-foreground: oklch(14.45% 0 0);
-  --color-card: oklch(100% 0 106.37);
-  --color-card-foreground: oklch(14.45% 0 0);
   --color-popover: oklch(100% 0 106.37);
   --color-popover-foreground: oklch(14.45% 0 0);
-  --color-primary: oklch(20.44% 0 0);
-  --color-primary-foreground: oklch(98.48% 0 0);
-  --color-secondary: oklch(97.03% 0 0);
-  --color-secondary-foreground: oklch(20.44% 0 0);
   --color-muted: oklch(97.03% 0 0);
   --color-muted-foreground: oklch(55.55% 0 0);
   --color-accent: oklch(97.03% 0 0);
   --color-accent-foreground: oklch(20.44% 0 0);
-  --color-destructive: oklch(63.68% 0.2078 25.33);
-  --color-destructive-foreground: oklch(98.48% 0 0);
   --color-border: oklch(92.19% 0 0);
   --color-input: oklch(92.19% 0 0);
   --color-ring: oklch(14.45% 0 0);
-  --color-chart-1: oklch(67.72% 0.1571 35.19);
-  --color-chart-2: oklch(63.09% 0.1013 183.49);
-  --color-chart-3: oklch(37.87% 0.044 225.54);
-  --color-chart-4: oklch(83.36% 0.1186 88.15);
-  --color-chart-5: oklch(78.34% 0.1261 58.75);
 
   --breakpoint-xs: 25rem;
 
@@ -44,48 +29,23 @@
 .dark {
   --color-background: oklch(14.45% 0 0);
   --color-foreground: oklch(98.48% 0 0);
-  --color-card: oklch(14.45% 0 0);
-  --color-card-foreground: oklch(98.48% 0 0);
   --color-popover: oklch(14.45% 0 0);
   --color-popover-foreground: oklch(98.48% 0 0);
-  --color-primary: oklch(98.48% 0 0);
-  --color-primary-foreground: oklch(20.44% 0 0);
-  --color-secondary: oklch(26.86% 0 0);
-  --color-secondary-foreground: oklch(98.48% 0 0);
   --color-muted: oklch(26.86% 0 0);
   --color-muted-foreground: oklch(71.53% 0 0);
   --color-accent: oklch(26.86% 0 0);
   --color-accent-foreground: oklch(98.48% 0 0);
-  --color-destructive: oklch(39.59% 0.1331 25.72);
-  --color-destructive-foreground: oklch(98.48% 0 0);
   --color-border: oklch(1 0 0 / 10%);
   --color-input: oklch(1 0 0 / 15%);
   --color-ring: oklch(86.97% 0 0);
-  --color-chart-1: oklch(52.92% 0.1931 262.13);
-  --color-chart-2: oklch(69.83% 0.1337 165.46);
-  --color-chart-3: oklch(72.32% 0.15 60.63);
-  --color-chart-4: oklch(61.92% 0.2037 312.73);
-  --color-chart-5: oklch(61.23% 0.2093 6.39);
 }
 
-/*
-  The default border color has changed to `currentColor` in Tailwind CSS v4,
-  so we've added these compatibility styles to make sure everything still
-  looks the same as it did with Tailwind CSS v3.
-
-  If we ever want to remove these styles, we need to add an explicit border
-  color utility to any element that depends on these defaults.
-*/
 @layer base {
   *,
   ::after,
   ::before,
   ::backdrop,
   ::file-selector-button {
-    border-color: var(--color-gray-200, currentColor);
-  }
-
-  * {
     @apply border-border;
   }
   body {

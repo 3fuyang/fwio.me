@@ -1,0 +1,50 @@
+---
+
+---
+
+<section class="mx-auto mt-12 max-w-prose" data-giscus></section>
+
+<script>
+  const GISCUS_ORIGIN = 'https://giscus.app'
+
+  function currentTheme() {
+    return document.documentElement.classList.contains('dark')
+      ? 'dark'
+      : 'light'
+  }
+
+  const container = document.querySelector('[data-giscus]')
+
+  if (container) {
+    const script = document.createElement('script')
+    script.src = `${GISCUS_ORIGIN}/client.js`
+    script.async = true
+    script.crossOrigin = 'anonymous'
+    Object.assign(script.dataset, {
+      repo: '3fuyang/giscus',
+      repoId: 'R_kgDONKr3yQ',
+      category: 'Announcements',
+      categoryId: 'DIC_kwDONKr3yc4Cj_Yn',
+      mapping: 'pathname',
+      strict: '0',
+      reactionsEnabled: '0',
+      emitMetadata: '0',
+      inputPosition: 'bottom',
+      theme: currentTheme(),
+      lang: 'en',
+    })
+    container.append(script)
+
+    new MutationObserver(() => {
+      document
+        .querySelector<HTMLIFrameElement>('iframe.giscus-frame')
+        ?.contentWindow?.postMessage(
+          { giscus: { setConfig: { theme: currentTheme() } } },
+          GISCUS_ORIGIN,
+        )
+    }).observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class'],
+    })
+  }
+</script>

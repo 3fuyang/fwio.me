@@ -3,6 +3,7 @@ title: Readings 250726
 description: Readings
 lang: en
 pubDate: 2025-07-26T16:00:00+08:00
+category: reading
 ---
 
 - [WebAssembly: Yes, but for What? - ACM Queue](https://queue.acm.org/detail.cfm?id=3746171) - Very rich and detailed content.

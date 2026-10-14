@@ -1,17 +1,10 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro'
-import { getCollection } from 'astro:content'
+import { getPublishedPosts, toPostListItem } from '@/lib/posts'
 
-const allBlogPosts = await getCollection('essay', ({ data }) => {
-  return import.meta.env.PROD ? !data.draft : true
-})
-
-const posts = allBlogPosts
-  .map(({ slug, data }) => ({
-    slug: `/essay/${slug}`,
-    data,
-  }))
-  .sort((a, b) => Number(b.data.pubDate) - Number(a.data.pubDate))
+const posts = (await getPublishedPosts('essay')).map((post) =>
+  toPostListItem(post),
+)
 ---
 
 <BaseLayout title="Essay | Fwio">
@@ -24,37 +17,27 @@ const posts = allBlogPosts
       </h2>
       <div class="space-y-6">
         {
-          posts.map(({ slug, data: { title, pubDate } }) => {
-            const dateTime = new Date(pubDate).toLocaleDateString('en-US')
-
-            return (
-              <article>
-                <a
-                  href={slug}
-                  class:list={[
-                    'ml-2 block rounded-sm px-1',
-                    'text-foreground/90 hover:text-foreground focus-visible:text-foreground',
-                    'block',
-                    'transition-colors',
-                    'group',
-                  ]}
+          posts.map(({ url, title, date, datetime }) => (
+            <article>
+              <a
+                href={url}
+                class="group text-foreground/90 hover:text-foreground focus-visible:text-foreground ml-2 block rounded-sm px-1 transition-colors"
+              >
+                <h3
+                  title={title}
+                  class="truncate text-base tracking-wide underline-offset-4 group-hover:underline group-focus-visible:underline"
                 >
-                  <h3
-                    title={title}
-                    class="truncate text-base tracking-wide underline-offset-4 group-hover:underline group-focus-visible:underline"
-                  >
-                    {title}
-                  </h3>
-                  <time
-                    class="text-foreground/60 text-xs sm:text-sm"
-                    datetime={dateTime}
-                  >
-                    {dateTime}
-                  </time>
-                </a>
-              </article>
-            )
-          })
+                  {title}
+                </h3>
+                <time
+                  class="text-foreground/60 text-xs sm:text-sm"
+                  datetime={datetime}
+                >
+                  {date}
+                </time>
+              </a>
+            </article>
+          ))
         }
       </div>
     </section>

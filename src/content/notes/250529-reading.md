@@ -3,6 +3,7 @@ title: Readings 250529
 description: Readings
 lang: en
 pubDate: 2025-05-29T21:00:00+08:00
+category: reading
 ---
 
 - [Cascading Cache Invalidation — Philip Walton](https://philipwalton.com/articles/cascading-cache-invalidation/) - Really impressed by the "cascading cache invalidation" problem, especially for a fanatic code splitter like me.

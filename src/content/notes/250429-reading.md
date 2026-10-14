@@ -3,6 +3,7 @@ title: Readings 250429
 description: Readings
 lang: en
 pubDate: 2025-04-29T22:30:00+08:00
+category: reading
 ---
 
 - [You should know this before choosing Next.js](https://eduardoboucas.com/posts/2025-03-25-you-should-know-this-before-choosing-nextjs/) - Make me even more concerned with the future of React.

@@ -1,30 +1,28 @@
 ---
 import MarkdownLayout from '@/layouts/MarkdownLayout.astro'
-import { getCollection } from 'astro:content'
+import { getPublishedPosts, type Post } from '@/lib/posts'
+import { render } from 'astro:content'
 
 export async function getStaticPaths() {
-  const allBlogPosts = await getCollection('essay', ({ data }) => {
-    return import.meta.env.PROD ? data.draft !== true : true
-  })
+  const posts = await getPublishedPosts('essay')
 
-  return allBlogPosts.map(({ slug, render, data }) => ({
-    params: {
-      slug,
-    },
-    props: Object.assign(data, {
-      render,
-    }),
-  }))
+  return posts.map((post) => ({ params: { slug: post.id }, props: { post } }))
 }
 
-const { render, title, lang = 'en' } = Astro.props
+interface Props {
+  post: Post<'essay'>
+}
 
-const { Content } = await render()
+const { post } = Astro.props
+const { title, description, pubDate, lang = 'en' } = post.data
+
+const { Content } = await render(post)
 ---
 
 <MarkdownLayout
   lang={lang === 'zh' ? 'zh-CN' : 'en-US'}
   title={`${title} | Fwio`}
+  {...{ description, pubDate }}
 >
   <h1 class="text-2xl font-semibold text-pretty md:text-3xl">{title}</h1>
   <Content />

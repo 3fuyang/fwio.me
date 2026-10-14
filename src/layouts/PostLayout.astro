@@ -1,0 +1,44 @@
+---
+import Giscus from '@/components/Giscus.astro'
+import TableOfContents from '@/components/TableOfContents.astro'
+import { formatDate, type Post } from '@/lib/posts'
+import { render } from 'astro:content'
+import { ClockIcon } from 'lucide-react'
+import MarkdownLayout from './MarkdownLayout.astro'
+
+interface Props {
+  post: Post<'blog' | 'notes'>
+}
+
+const { post } = Astro.props
+const { title, keywords, description, pubDate, lang = 'en' } = post.data
+
+const { Content, headings, remarkPluginFrontmatter } = await render(post)
+---
+
+<MarkdownLayout
+  lang={lang === 'zh' ? 'zh-CN' : 'en-US'}
+  title={`${title} | Fwio`}
+  {...{ keywords, description, pubDate }}
+>
+  <h1
+    transition:name="heading"
+    class="text-2xl font-semibold text-pretty md:text-3xl"
+  >
+    {title}
+  </h1>
+  <section class="text-muted-foreground flex items-center space-x-6 text-sm">
+    <time transition:name="date" datetime={pubDate.toISOString()}
+      >{formatDate(pubDate)}</time
+    >
+    <div class="flex items-center space-x-2">
+      <ClockIcon className="size-4" />
+      <span>{remarkPluginFrontmatter.minutesRead}</span>
+    </div>
+  </section>
+  <TableOfContents
+    headings={[{ text: title, slug: 'top', depth: 1 }, ...headings]}
+  />
+  <Content />
+  <Giscus />
+</MarkdownLayout>

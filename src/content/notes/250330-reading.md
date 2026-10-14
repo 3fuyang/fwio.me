@@ -3,6 +3,7 @@ title: Readings 250330
 description: Readings
 lang: en
 pubDate: 2025-03-30T00:30:00+08:00
+category: reading
 ---
 
 - [Optimized for Change — overreacted](https://overreacted.io/optimized-for-change/)

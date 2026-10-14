@@ -3,17 +3,26 @@ import '@fontsource/ibm-plex-mono'
 import BaseLayout from './BaseLayout.astro'
 import './MarkdownLayout.css'
 
-interface Props {
+interface LayoutProps {
   title: string
   keywords?: string[]
   description?: string
   lang?: string
+  pubDate?: Date
 }
 
-const { title, keywords, description, lang } = Astro.props
+// MDX pages using `layout:` frontmatter pass their data as `frontmatter`.
+type Props = LayoutProps | { frontmatter: Omit<LayoutProps, 'pubDate'> }
+
+const props = Astro.props
+const isMdxLayout = 'frontmatter' in props
+const { title, keywords, description, lang } = isMdxLayout
+  ? props.frontmatter
+  : props
+const pubDate = isMdxLayout ? undefined : props.pubDate
 ---
 
-<BaseLayout {...{ title, keywords, description, lang }}>
+<BaseLayout {...{ title, keywords, description, lang, pubDate }}>
   <article
     class="prose prose-base prose-slate dark:prose-invert prose-p:text-pretty mx-auto max-w-prose"
   >

@@ -1,5 +1,6 @@
 import { rssSchema } from '@astrojs/rss'
 import { defineCollection, z } from 'astro:content'
+import { glob } from 'astro/loaders'
 
 const postSchema = rssSchema
   .extend({
@@ -8,19 +9,27 @@ const postSchema = rssSchema
     description: z.string().optional(),
     lang: z.enum(['zh', 'en']).optional(),
     draft: z.boolean().optional(),
-    minutesRead: z.string().optional(),
   })
   .required({
     pubDate: true,
   })
 
+function postsIn(dir: string) {
+  return glob({ pattern: '**/*.{md,mdx}', base: `./src/content/${dir}` })
+}
+
 const blogCollection = defineCollection({
+  loader: postsIn('blog'),
   schema: postSchema,
 })
 const notesCollection = defineCollection({
-  schema: postSchema,
+  loader: postsIn('notes'),
+  schema: postSchema.extend({
+    category: z.enum(['reading', 'regular']).default('regular'),
+  }),
 })
 const essayCollection = defineCollection({
+  loader: postsIn('essay'),
   schema: postSchema,
 })
 

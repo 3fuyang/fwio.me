@@ -35,17 +35,7 @@ export default function ThemeSwitch() {
           value={ternaryDarkMode}
           onValueChange={(value) => {
             setTernaryDarkMode(value as TernaryDarkMode)
-
-            const isDarkOS = window.matchMedia(
-              '(prefers-color-scheme: dark)',
-            ).matches
-            const isDarkMode =
-              value === 'dark' || (value === 'system' && isDarkOS)
-            if (isDarkMode) {
-              document.documentElement.classList.add('dark')
-            } else {
-              document.documentElement.classList.remove('dark')
-            }
+            window.applyTheme?.(value as TernaryDarkMode)
           }}
         >
           <DropdownMenuRadioItem value="light">

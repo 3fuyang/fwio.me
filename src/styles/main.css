@@ -19,8 +19,11 @@
   --c-scrollbar-active: oklch(95.16% 0.0055 211.04);
 }
 
-* {
-  scrollbar-color: var(--c-scrollbar) var(--c-bg);
+/* Chromium ignores ::-webkit-scrollbar once scrollbar-color is set. */
+@supports not selector(::-webkit-scrollbar) {
+  * {
+    scrollbar-color: var(--c-scrollbar) transparent;
+  }
 }
 
 ::-webkit-scrollbar {
@@ -33,7 +36,7 @@
 
 ::-webkit-scrollbar-track,
 ::-webkit-scrollbar-corner {
-  background: var(--c-bg);
+  background: transparent;
   border-radius: 5px;
 }
 

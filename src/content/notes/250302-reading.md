@@ -3,6 +3,7 @@ title: Readings 250302
 description: Readings
 lang: en
 pubDate: 2025-03-02T12:00:00+08:00
+category: reading
 ---
 
 - [Measure performance with the RAIL model |  web.dev](https://web.dev/articles/rail#load_deliver_content_and_become_interactive_in_under_5_seconds) - A few notes:
