@@ -3,7 +3,7 @@ title: No Change-Detector Tests
 description: Readings
 lang: en
 pubDate: 2026-11-14T01:00:00+08:00
-category: note
+category: reading
 ---
 
 > While listening to "Good Love Dies" by Chance Peña.
